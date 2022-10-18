@@ -25,5 +25,5 @@ CREATE TABLE user_vocabulary (
 );
 
 INSERT INTO "user_vocabulary" ("id_user", "spelling", "auding", "english", "russian") 
-VALUES (1, ARRAY[1,2,3], ARRAY[1,2,3], ARRAY[1,2,3], ARRAY[1,2,3]);
+VALUES (1, ARRAY[1,2,3], ARRAY[10,11,12], ARRAY[19,20,21], ARRAY[28,29,30]);
 

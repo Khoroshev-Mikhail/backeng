@@ -68,6 +68,7 @@ app.get('/words/group/:id', async (req, res) => {
         return res.status(500).send(e.message)
     }
 })
+
 app.get('/vocabulary/:id', async (req, res) => {
     try {
         const data = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [req.params.id]);
@@ -77,6 +78,7 @@ app.get('/vocabulary/:id', async (req, res) => {
         return res.status(500).send(e.message)
     }
 })
+
 
 app.put('/vocabulary/:id/:method', jsonParser, async (req, res) => {
     try {

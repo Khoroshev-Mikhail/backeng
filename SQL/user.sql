@@ -5,10 +5,10 @@ SET escape_string_warning = off;
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    user_login VARCHAR(25), /*Р”РѕР±Р°РІРёС‚СЊ СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊ*/
+    user_login VARCHAR(25), /*Добавить уникальность*/
     user_password VARCHAR(25),
     user_name VARCHAR(25),
-    email VARCHAR(100) DEFAULT NULL, /*Р”РѕР±Р°РІРёС‚СЊ СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊ*/
+    email VARCHAR(100) DEFAULT NULL, /*Добавить уникальность*/
     birth DATE DEFAULT NULL
 );
 

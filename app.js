@@ -79,15 +79,50 @@ app.get('/vocabulary/:id', async (req, res) => {
     }
 })
 
+function falseVariants(vocabular, trueVariant){
+    const count = 3 //Может быть в будущем предоставить на выбор клиенту количество вариантов для ответа
+    let uniqueSet = new Set();
+    uniqueSet.add(trueVariant)
+    while(uniqueSet.size <= count){
+        const item = vocabular[Math.floor(Math.random() * vocabular.length)]
+        uniqueSet.add(item)
+    }
+    return Array.from(uniqueSet).sort(() => Math.random() - 0.5)
+}
+app.get('/vocabulary/:id/unlerned/:method/group/:groupId', async (req, res) => {
+    try {
+        const vocabulary = await db.one('SELECT $1~ FROM user_vocabulary WHERE id_user = $2', [req.params.method, req.params.id]);
+        const group = await db.any('SELECT words.id, words.eng, words.rus FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [req.params.groupId]);
+        const unlernedGroup = group.filter(el => !vocabulary[req.params.method].includes(el.id))
+        const index = Math.floor(Math.random() * unlernedGroup.length)
+        const trueVariant = unlernedGroup[index]
+        const falseVariant = falseVariants(group, trueVariant)
+        return res.status(200).send({trueVariant, falseVariant})
+    } 
+    catch(e) {
+        return res.status(500).send(e.message)
+    }
+})
+
 
 app.put('/vocabulary/:id/:method', jsonParser, async (req, res) => {
     try {
+        if(req.body.word_id === 0){
+            return res.sendStatus(200)
+        }
         const methods = ['russian', 'english', 'spelling', 'auding']
         const method = req.params.method
         if(!methods.includes(method)) throw new Error('Неверный url')
-
-        const data = await db.one(`UPDATE user_vocabulary SET ${method} = ${method} || $2 WHERE id_user = $3 RETURNING id_user`, [req.params.method, req.body.word_id, req.params.id])
-        return data.id_user >= 0 ? res.status(200).send(data) : res.sendStatus(500)
+        await db.none('UPDATE user_vocabulary SET $1~ = $1~ || $2 WHERE id_user = $3', [req.params.method, req.body.word_id, req.params.id])
+        return res.sendStatus(200)
+    } 
+    catch(e) {
+        return res.status(500).send(e.message)
+    }
+})
+app.put('/vocabulary/wrong', jsonParser, async (req, res) => {
+    try {
+        return res.sendStatus(200)
     } 
     catch(e) {
         return res.status(500).send(e.message)

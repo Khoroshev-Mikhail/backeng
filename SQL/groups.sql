@@ -10,9 +10,9 @@ CREATE TABLE word_groups (
     word_ids INTEGER[]
 );
 
-INSERT INTO "word_groups" ("title", "title_rus", "word_ids") VALUES ('100nouns', 'РўРѕРї-100 РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅС‹С…', ARRAY[1,2,3,4,5,6,7,8,9]);
-INSERT INTO "word_groups" ("title", "title_rus", "word_ids") VALUES ('100adjectives', 'РўРѕРї-100 РџСЂРёР»Р°РіР°С‚РµР»СЊРЅС‹С…', ARRAY[10,11,12,13,14,15,16,17,18]);
-INSERT INTO "word_groups" ("title", "title_rus", "word_ids") VALUES ('100adverbs', 'РўРѕРї-100 РќР°СЂРµС‡РёР№', ARRAY[19,20,21,22,23,24,25,26,27]);
-INSERT INTO "word_groups" ("title", "title_rus", "word_ids") VALUES ('100verbs', 'РўРѕРї-100 Р“Р»Р°РіРѕР»РѕРІ', ARRAY[28,29,30,31,32,33,34,35,36]);
+INSERT INTO "word_groups" ("title", "title_rus", "word_ids") VALUES ('100nouns', 'Топ-100 Существительных', ARRAY[1,2,3,4,5,6,7,8,9]);
+INSERT INTO "word_groups" ("title", "title_rus", "word_ids") VALUES ('100adjectives', 'Топ-100 Прилагательных', ARRAY[10,11,12,13,14,15,16,17,18]);
+INSERT INTO "word_groups" ("title", "title_rus", "word_ids") VALUES ('100adverbs', 'Топ-100 Наречий', ARRAY[19,20,21,22,23,24,25,26,27]);
+INSERT INTO "word_groups" ("title", "title_rus", "word_ids") VALUES ('100verbs', 'Топ-100 Глаголов', ARRAY[28,29,30,31,32,33,34,35,36]);
 
 

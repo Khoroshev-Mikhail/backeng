@@ -37,6 +37,16 @@ app.put('/words', jsonParser, async (req, res) => {
     }
 })
 
+app.delete('/words', jsonParser, async (req, res) => {
+    try {
+        await db.none('DELETE FROM words WHERE id = $1', [req.body.id])
+        return res.sendStatus(200)
+    } 
+    catch(e) {
+        return res.status(500).send(e.message)
+    }
+})
+
 app.post('/words', jsonParser, async (req, res) => {
     try {
         if(!req.body.eng || !req.body.eng){

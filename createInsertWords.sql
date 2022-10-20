@@ -10,8 +10,8 @@ CREATE TABLE words (
     rus VARCHAR(25)
 );
 
-INSERT INTO "words" ("eng", "rus") VALUES ('Love', 'Любовь');
-INSERT INTO "words" ("eng", "rus") VALUES ('Purposefulness', 'Целеустремленность');
-INSERT INTO "words" ("eng", "rus") VALUES ('Perseverance', 'Настойчивость');
-INSERT INTO "words" ("eng", "rus") VALUES ('Persistence', 'Упорство');
+INSERT INTO "words" ("eng", "rus") VALUES ('Love', 'Р›СЋР±РѕРІСЊ');
+INSERT INTO "words" ("eng", "rus") VALUES ('Purposefulness', 'Р¦РµР»РµСѓСЃС‚СЂРµРјР»РµРЅРЅРѕСЃС‚СЊ');
+INSERT INTO "words" ("eng", "rus") VALUES ('Perseverance', 'РќР°СЃС‚РѕР№С‡РёРІРѕСЃС‚СЊ');
+INSERT INTO "words" ("eng", "rus") VALUES ('Persistence', 'РЈРїРѕСЂСЃС‚РІРѕ');
 

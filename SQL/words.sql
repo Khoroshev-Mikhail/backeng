@@ -7,43 +7,45 @@ SET escape_string_warning = off;
 CREATE TABLE words (
     id SERIAL PRIMARY KEY,
     eng VARCHAR(25),
-    rus VARCHAR(25)
+    rus VARCHAR(25),
+    img VARCHAR(100) DEFAULT null,
+    audio VARCHAR(100) DEFAULT null
 );
 
-INSERT INTO "words" ("eng", "rus") VALUES ('Nouns1', 'РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ1');
-INSERT INTO "words" ("eng", "rus") VALUES ('Nouns2', 'РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ2');
-INSERT INTO "words" ("eng", "rus") VALUES ('Nouns3', 'РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ3');
-INSERT INTO "words" ("eng", "rus") VALUES ('Nouns4', 'РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ4');
-INSERT INTO "words" ("eng", "rus") VALUES ('Nouns5', 'РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ5');
-INSERT INTO "words" ("eng", "rus") VALUES ('Nouns6', 'РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ6');
-INSERT INTO "words" ("eng", "rus") VALUES ('Nouns7', 'РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ7');
-INSERT INTO "words" ("eng", "rus") VALUES ('Nouns8', 'РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ8');
-INSERT INTO "words" ("eng", "rus") VALUES ('Nouns9', 'РЎСѓС‰РµСЃС‚РІРёС‚РµР»СЊРЅРѕРµ9');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives1', 'РџСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ1');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives2', 'РџСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ2');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives3', 'РџСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ3');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives4', 'РџСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ4');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives5', 'РџСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ5');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives6', 'РџСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ6');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives7', 'РџСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ7');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives8', 'РџСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ8');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives9', 'РџСЂРёР»Р°РіР°С‚РµР»СЊРЅРѕРµ9');
-INSERT INTO "words" ("eng", "rus") VALUES ('Verb1', 'Р“Р»Р°РіРѕР»1');
-INSERT INTO "words" ("eng", "rus") VALUES ('Verb2', 'Р“Р»Р°РіРѕР»2');
-INSERT INTO "words" ("eng", "rus") VALUES ('Verb3', 'Р“Р»Р°РіРѕР»3');
-INSERT INTO "words" ("eng", "rus") VALUES ('Verb4', 'Р“Р»Р°РіРѕР»4');
-INSERT INTO "words" ("eng", "rus") VALUES ('Verb5', 'Р“Р»Р°РіРѕР»5');
-INSERT INTO "words" ("eng", "rus") VALUES ('Verb6', 'Р“Р»Р°РіРѕР»6');
-INSERT INTO "words" ("eng", "rus") VALUES ('Verb7', 'Р“Р»Р°РіРѕР»7');
-INSERT INTO "words" ("eng", "rus") VALUES ('Verb8', 'Р“Р»Р°РіРѕР»8');
-INSERT INTO "words" ("eng", "rus") VALUES ('Verb9', 'Р“Р»Р°РіРѕР»9');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adverb1', 'РќР°СЂРµС‡РёРµ1');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adverb2', 'РќР°СЂРµС‡РёРµ2');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adverb3', 'РќР°СЂРµС‡РёРµ3');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adverb4', 'РќР°СЂРµС‡РёРµ4');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adverb5', 'РќР°СЂРµС‡РёРµ5');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adverb6', 'РќР°СЂРµС‡РёРµ6');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adverb7', 'РќР°СЂРµС‡РёРµ7');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adverb8', 'РќР°СЂРµС‡РёРµ8');
-INSERT INTO "words" ("eng", "rus") VALUES ('Adverb9', 'РќР°СЂРµС‡РёРµ9');
+INSERT INTO "words" ("eng", "rus") VALUES ('Nouns1', 'Существительное1');
+INSERT INTO "words" ("eng", "rus") VALUES ('Nouns2', 'Существительное2');
+INSERT INTO "words" ("eng", "rus") VALUES ('Nouns3', 'Существительное3');
+INSERT INTO "words" ("eng", "rus") VALUES ('Nouns4', 'Существительное4');
+INSERT INTO "words" ("eng", "rus") VALUES ('Nouns5', 'Существительное5');
+INSERT INTO "words" ("eng", "rus") VALUES ('Nouns6', 'Существительное6');
+INSERT INTO "words" ("eng", "rus") VALUES ('Nouns7', 'Существительное7');
+INSERT INTO "words" ("eng", "rus") VALUES ('Nouns8', 'Существительное8');
+INSERT INTO "words" ("eng", "rus") VALUES ('Nouns9', 'Существительное9');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives1', 'Прилагательное1');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives2', 'Прилагательное2');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives3', 'Прилагательное3');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives4', 'Прилагательное4');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives5', 'Прилагательное5');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives6', 'Прилагательное6');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives7', 'Прилагательное7');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives8', 'Прилагательное8');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adjectives9', 'Прилагательное9');
+INSERT INTO "words" ("eng", "rus") VALUES ('Verb1', 'Глагол1');
+INSERT INTO "words" ("eng", "rus") VALUES ('Verb2', 'Глагол2');
+INSERT INTO "words" ("eng", "rus") VALUES ('Verb3', 'Глагол3');
+INSERT INTO "words" ("eng", "rus") VALUES ('Verb4', 'Глагол4');
+INSERT INTO "words" ("eng", "rus") VALUES ('Verb5', 'Глагол5');
+INSERT INTO "words" ("eng", "rus") VALUES ('Verb6', 'Глагол6');
+INSERT INTO "words" ("eng", "rus") VALUES ('Verb7', 'Глагол7');
+INSERT INTO "words" ("eng", "rus") VALUES ('Verb8', 'Глагол8');
+INSERT INTO "words" ("eng", "rus") VALUES ('Verb9', 'Глагол9');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adverb1', 'Наречие1');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adverb2', 'Наречие2');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adverb3', 'Наречие3');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adverb4', 'Наречие4');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adverb5', 'Наречие5');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adverb6', 'Наречие6');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adverb7', 'Наречие7');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adverb8', 'Наречие8');
+INSERT INTO "words" ("eng", "rus") VALUES ('Adverb9', 'Наречие9');
 

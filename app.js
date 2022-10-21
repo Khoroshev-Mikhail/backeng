@@ -61,13 +61,17 @@ app.delete('/words', jsonParser, async (req, res) => {
 
 app.post('/words', jsonParser, async (req, res) => {
     if(req.files){
-        const sampleFile = req.files.img;
-        const uploadPath = __dirname + '/images/' + sampleFile.name;
-        sampleFile.mv(uploadPath, function(err) {
-            if (err) throw new Error('Чёта с файлами')
+        const img = req.files.img;
+        const uploadPath = __dirname + '/images/' + img.name;
+        img.mv(uploadPath, function(err) {
+            if (err) throw new Error('Неправильная картинка')
+        });
+        const audio = req.files.audio;
+        const uploadPathAudio = __dirname + '/audio/' + audio.name;
+        img.mv(uploadPathAudio, function(err) {
+            if (err) throw new Error('Неправильное аудио')
         });
     }
-    console.log(req.body, req.files)
     try {
         await db.none('INSERT INTO words(eng, rus, img, audio) VALUES($1, $2, $3, $4)', [req.body.eng, req.body.rus, req.body.img, req.body.audio])
         return res.sendStatus(200)

@@ -13,7 +13,10 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Methods", "*");
     next();
 });
-app.use(fileUpload());
+app.use(fileUpload({
+    safeFileNames: /[^a-zа-яё\d\.]/ui,
+    limits: { fileSize: 0.5 * 1024 * 1024 },
+}));
 
 app.get('/', (req, res) => {
     return res.status(200).send("Сервер ожидает запросов...")
@@ -60,20 +63,39 @@ app.delete('/words', jsonParser, async (req, res) => {
 
 
 app.post('/words', jsonParser, async (req, res) => {
-    if(req.files){
-        const img = req.files.img;
-        const uploadPath = __dirname + '/images/' + img.name;
-        img.mv(uploadPath, function(err) {
-            if (err) throw new Error('Неправильная картинка')
-        });
-        const audio = req.files.audio;
-        const uploadPathAudio = __dirname + '/audio/' + audio.name;
-        img.mv(uploadPathAudio, function(err) {
-            if (err) throw new Error('Неправильное аудио')
-        });
-    }
+    console.log(req.files)
     try {
-        await db.none('INSERT INTO words(eng, rus, img, audio) VALUES($1, $2, $3, $4)', [req.body.eng, req.body.rus, req.body.img, req.body.audio])
+        const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [req.body.eng, req.body.rus])
+        if(req.files.img){
+            const img = req.files.img;
+            const imgTypes = ['mage/jpeg', 'image/png', 'image/jp2']
+            if(!imgTypes.includes(img.mimetype)){
+                throw new Error('Не подходящий формат аудио')
+            }
+            const imgFileName = id + '_' + req.body.eng + img.name.match(/\.[\w\d]+$/i)[0]
+            const imgUploadPath = __dirname + '/img/' + imgFileName;
+            await img.mv(imgUploadPath, function(err) {
+                if (err) {
+                    throw new Error('Ошибка при загрузке изображения.')
+                }
+            });
+            await db.none('UPDATE words SET img = $2 WHERE id = $1', [id, imgFileName])
+        }
+        if(req.files.audio){
+            const audio = req.files.audio;
+            const audioTypes = ['audio/wave', 'audio/wav', 'audio/x-wav', 'audio/x-pn-wav', 'audio/webm', 'audio/ogg']
+            if(!audioTypes.includes(audio.mimetype)){
+                throw new Error('Не подходящий формат аудио')
+            }
+            const audioFileName = id + '_' + req.body.eng + audio.name.match(/\.[\w\d]+$/i)[0]
+            const audioUploadPath = __dirname + '/audio/' + audioFileName;
+            await audio.mv(audioUploadPath, function(err) {
+                if (err) {
+                    throw new Error('Ошибка при загрузке аудио файла.')
+                }
+            });
+            await db.none('UPDATE words SET audio = $2 WHERE id = $1', [id, audioFileName])
+        }
         return res.sendStatus(200)
     } 
     catch(e) {

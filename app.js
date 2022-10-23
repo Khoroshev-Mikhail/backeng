@@ -15,7 +15,7 @@ app.use(function(req, res, next) {
 });
 app.use(fileUpload({
     safeFileNames: /[^a-zа-яё\d\.]/ui,
-    limits: { fileSize: 0.5 * 1024 * 1024 },
+    limits: { fileSize: 1 * 1024 * 1024 },
 }));
 
 app.get('/', (req, res) => {
@@ -63,7 +63,6 @@ app.delete('/words', jsonParser, async (req, res) => {
 
 
 app.post('/words', jsonParser, async (req, res) => {
-    console.log(req.files)
     try {
         const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [req.body.eng, req.body.rus])
         if(req.files.img){
@@ -96,7 +95,7 @@ app.post('/words', jsonParser, async (req, res) => {
             });
             await db.none('UPDATE words SET audio = $2 WHERE id = $1', [id, audioFileName])
         }
-        return res.sendStatus(200)
+        return res.status(200).send(`${id}`)
     } 
     catch(e) {
         return res.status(500).send(e.message)

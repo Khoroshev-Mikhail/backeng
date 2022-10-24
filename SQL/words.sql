@@ -1,4 +1,5 @@
 /* psql -U postgres -d english -f words.sql */
+/* \i /Users/tatanaarhipova/MikeIT/backeng/SQL/words.sql */
 SET standard_conforming_strings = off;
 SET check_function_bodies = false;
 SET client_min_messages = warning;

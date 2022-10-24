@@ -17,6 +17,7 @@ app.use(fileUpload({
     safeFileNames: /[^a-zа-яё\d\.]/ui,
     limits: { fileSize: 1 * 1024 * 1024 },
 }));
+app.use(express.static('public'));
 
 app.get('/', (req, res) => {
     return res.status(200).send("Сервер ожидает запросов...")
@@ -65,14 +66,14 @@ app.delete('/words', jsonParser, async (req, res) => {
 app.post('/words', jsonParser, async (req, res) => {
     try {
         const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [req.body.eng, req.body.rus])
-        if(req.files.img){
+        if(req.files.img !== undefined){
             const img = req.files.img;
-            const imgTypes = ['mage/jpeg', 'image/png', 'image/jp2']
+            const imgTypes = ['image/jpeg', 'image/png', 'image/jp2']
             if(!imgTypes.includes(img.mimetype)){
-                throw new Error('Не подходящий формат аудио')
+                throw new Error('Не подходящий формат изображения')
             }
             const imgFileName = id + '_' + req.body.eng + img.name.match(/\.[\w\d]+$/i)[0]
-            const imgUploadPath = __dirname + '/img/' + imgFileName;
+            const imgUploadPath = __dirname + '/public/img/' + imgFileName;
             await img.mv(imgUploadPath, function(err) {
                 if (err) {
                     throw new Error('Ошибка при загрузке изображения.')
@@ -80,14 +81,14 @@ app.post('/words', jsonParser, async (req, res) => {
             });
             await db.none('UPDATE words SET img = $2 WHERE id = $1', [id, imgFileName])
         }
-        if(req.files.audio){
+        if(req.files.audio !== undefined){
             const audio = req.files.audio;
             const audioTypes = ['audio/wave', 'audio/wav', 'audio/x-wav', 'audio/x-pn-wav', 'audio/webm', 'audio/ogg']
             if(!audioTypes.includes(audio.mimetype)){
                 throw new Error('Не подходящий формат аудио')
             }
             const audioFileName = id + '_' + req.body.eng + audio.name.match(/\.[\w\d]+$/i)[0]
-            const audioUploadPath = __dirname + '/audio/' + audioFileName;
+            const audioUploadPath = __dirname + '/public/audio/' + audioFileName;
             await audio.mv(audioUploadPath, function(err) {
                 if (err) {
                     throw new Error('Ошибка при загрузке аудио файла.')
@@ -204,7 +205,7 @@ function falseVariants(vocabular, trueVariant){
 app.get('/vocabulary/:id/unlerned/:method/group/:groupId', async (req, res) => {
     try {
         const vocabulary = await db.one('SELECT $1~ FROM user_vocabulary WHERE id_user = $2', [req.params.method, req.params.id]);
-        const group = await db.any('SELECT words.id, words.eng, words.rus FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [req.params.groupId]);
+        const group = await db.any('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [req.params.groupId]);
         const unlernedGroup = group.filter(el => !vocabulary[req.params.method].includes(el.id))
         const index = Math.floor(Math.random() * unlernedGroup.length)
         const trueVariant = unlernedGroup[index]

@@ -7,7 +7,7 @@ CREATE TABLE word_groups (
     id SERIAL PRIMARY KEY,
     title VARCHAR (100),
     title_rus VARCHAR (100),
-    word_ids INTEGER[]
+    word_ids INTEGER[] /*Когда удаляется слово надо автоматически удалять айдишник слова из этого массива. Желательно удалять из массива*/
 );
 
 INSERT INTO "word_groups" ("title", "title_rus", "word_ids") VALUES ('100nouns', 'Топ-100 Существительных', ARRAY[1,2,3,4,5,6,7,8,9]);

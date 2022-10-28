@@ -54,7 +54,9 @@ app.put('/words', jsonParser, async (req, res) => {
 
 app.delete('/words', jsonParser, async (req, res) => {
     try {
-        await db.none('DELETE FROM words WHERE id = $1', [req.body.id])
+        //Либо переписать это чтобы в postgress удалялось каскодом из массива idшник слова
+        const { id } = await db.one('DELETE FROM words WHERE id = $1 RETURNING id', [req.body.id])
+        await db.none('UPDATE word_groups SET word_ids = array_remove(word_ids, $2) WHERE id = $1', [req.body.id, id])
         return res.sendStatus(200)
     } 
     catch(e) {
@@ -118,8 +120,9 @@ app.get('/groups/:groupId/progress/:userId', async (req, res) => {
         const result = {}
         for(const key in vocabulary){
             const unlerned = groupWords.filter(el => vocabulary[key].includes(el)).length
-            result[key] = unlerned / groupWords.length * 100
+            result[key] = Math.floor(unlerned / groupWords.length * 100)
         }
+
         return res.status(200).send(result)
     } 
     catch(e) {
@@ -189,6 +192,7 @@ app.get('/words/group/:id', async (req, res) => {
 app.get('/vocabulary/:id', async (req, res) => {
     try {
         const data = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [req.params.id]);
+        console.log(data)
         return res.status(200).send(data)
     } 
     catch(e) {
@@ -202,7 +206,9 @@ function falseVariants(vocabular, trueVariant){
     uniqueSet.add(trueVariant)
     while(uniqueSet.size <= count){
         const item = vocabular[Math.floor(Math.random() * vocabular.length)]
-        uniqueSet.add(item)
+        if(item.eng && item.rus){
+            uniqueSet.add(item)
+        }
     }
     return Array.from(uniqueSet).sort(() => Math.random() - 0.5)
 }
@@ -210,12 +216,11 @@ app.get('/vocabulary/:id/unlerned/:method/group/:groupId', async (req, res) => {
     try {
         const vocabulary = await db.one('SELECT $1~ FROM user_vocabulary WHERE id_user = $2', [req.params.method, req.params.id]);
         const group = await db.any('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [req.params.groupId]);
-        const unlernedGroup = group.filter(el => !vocabulary[req.params.method].includes(el.id))
+        const unlernedGroup = group.filter(el => !vocabulary[req.params.method].includes(el.id) && el.rus && el.eng)
         if(unlernedGroup.length !== 0){
             const index = Math.floor(Math.random() * unlernedGroup.length)
             const trueVariant = unlernedGroup[index]
             const falseVariant = falseVariants(group, trueVariant)
-            console.log({trueVariant, falseVariant})
             return res.status(200).send({trueVariant, falseVariant})
         }
         return res.status(204).send('the end')

@@ -1,7 +1,7 @@
 const db = require("../db");
 
 class Vocabulary {
-    async getUserVocabulary (req, res, next){
+    static async getUserVocabulary (req, res, next){
         try {
             const data = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [req.params.id]);
             console.log(data)
@@ -11,7 +11,7 @@ class Vocabulary {
             return res.status(500).send(e.message)
         }
     }
-    async getSpellVocabulary (req, res, next){
+    static async getSpellVocabulary (req, res, next){
         try {
             const vocabulary = await db.one('SELECT spelling FROM user_vocabulary WHERE id_user = $1', [req.params.id]);
             const group = await db.any('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [req.params.groupId]);
@@ -28,7 +28,7 @@ class Vocabulary {
             return res.status(500).send(e.message)
         }
     }
-    async getVocabularyByMethod (req, res, next){
+    static async getVocabularyByMethod (req, res, next){
         function falseVariants(vocabular, trueVariant){
             const count = vocabular.length - 1 <= 3 ? vocabular.length - 1 : 3 //Может быть в будущем предоставить на выбор клиенту количество вариантов для ответа
             let uniqueSet = new Set();
@@ -58,7 +58,7 @@ class Vocabulary {
             return res.status(500).send(e.message)
         }
     }
-    async update (req, res, next){
+    static async update (req, res, next){
         try {
             if(!req.body.word_id || !req.body.userId){
                 return res.sendStatus(400)
@@ -75,7 +75,7 @@ class Vocabulary {
             return res.status(500).send(e.message)
         }
     }
-    async wrong (req, res, next){
+    static async wrong (req, res, next){
         try {
             return res.sendStatus(200)
         } 
@@ -86,4 +86,4 @@ class Vocabulary {
     
 }
 
-module.exports = new Vocabulary()
+module.exports = Vocabulary

@@ -1,7 +1,7 @@
 const db = require("../db");
 
 class Groups {
-    async getAllGroups (req, res, next){
+    static async getAllGroups (req, res, next){
         try {
             const data = await db.any('SELECT * FROM word_groups');
             return res.status(200).send(data)
@@ -10,7 +10,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    async add (req, res, next){
+    static async add (req, res, next){
         try {
             if(!req.body.title || !req.body.title_rus){
                 throw new Error('Пустые поля в request.body')
@@ -22,7 +22,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    async getGroupProgress (req, res, next){
+    static async getGroupProgress (req, res, next){
         try {
             const vocabulary = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [req.params.userId]);
             const { word_ids: groupWords } = await db.one('SELECT word_ids FROM word_groups WHERE id = $1', [req.params.groupId]);
@@ -38,7 +38,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    async delete (req, res, next){
+    static async delete (req, res, next){
         try {
             await db.none('DELETE FROM word_groups WHERE id = $1', [req.body.id])
             return res.sendStatus(200)
@@ -47,7 +47,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    async update (req, res, next){
+    static async update (req, res, next){
         try {
             await db.none('UPDATE word_groups SET title = $2, title_rus = $3 WHERE id = $1', [req.body.id, req.body.title, req.body.title_rus])
             return res.sendStatus(200)
@@ -56,7 +56,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    async addWordToGroup (req, res, next){
+    static async addWordToGroup (req, res, next){
         try {
             await db.none('UPDATE word_groups SET word_ids = word_ids || $2 WHERE id = $1', [req.body.id, req.body.word_id])
             return res.sendStatus(200)
@@ -65,7 +65,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    async deleteWordFromGroup (req, res, next){
+    static async deleteWordFromGroup (req, res, next){
         try {
             await db.none('UPDATE word_groups SET word_ids = array_remove(word_ids, $2) WHERE id = $1', [req.body.id, req.body.word_id])
             return res.sendStatus(200)
@@ -77,4 +77,4 @@ class Groups {
 
 }
 
-module.exports = new Groups()
+module.exports = Groups

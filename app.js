@@ -212,6 +212,24 @@ function falseVariants(vocabular, trueVariant){
     }
     return Array.from(uniqueSet).sort(() => Math.random() - 0.5)
 }
+
+app.get('/vocabulary/:id/unlerned/spelling/group/:groupId', async (req, res) => {
+    try {
+        const vocabulary = await db.one('SELECT spelling FROM user_vocabulary WHERE id_user = $1', [req.params.id]);
+        const group = await db.any('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [req.params.groupId]);
+        const unlernedGroup = group.filter(el => !vocabulary.spelling.includes(el.id) && el.rus && el.eng)
+        if(unlernedGroup.length !== 0){
+            const index = Math.floor(Math.random() * unlernedGroup.length)
+            const trueVariant = unlernedGroup[index]
+            return res.status(200).send(trueVariant)
+        }
+        return res.status(204).send('the end')
+        
+    } 
+    catch(e) {
+        return res.status(500).send(e.message)
+    }
+})
 app.get('/vocabulary/:id/unlerned/:method/group/:groupId', async (req, res) => {
     try {
         const vocabulary = await db.one('SELECT $1~ FROM user_vocabulary WHERE id_user = $2', [req.params.method, req.params.id]);
@@ -233,13 +251,16 @@ app.get('/vocabulary/:id/unlerned/:method/group/:groupId', async (req, res) => {
 
 
 app.put('/vocabulary/:id/:method', jsonParser, async (req, res) => {
+    console.log(req.params.method, req.body.word_id)
     try {
-        if(req.body.word_id === 0){
-            return res.sendStatus(200)
+        if(!req.body.word_id || !req.body.userId){
+            return res.sendStatus(400)
         }
         const methods = ['russian', 'english', 'spelling', 'auding']
         const method = req.params.method
-        if(!methods.includes(method)) throw new Error('Неверный url')
+        if(!methods.includes(method)){ 
+            throw new Error('Неверный url')
+        }
         await db.none('UPDATE user_vocabulary SET $1~ = $1~ || $2 WHERE id_user = $3', [req.params.method, req.body.word_id, req.params.id])
         return res.sendStatus(200)
     } 

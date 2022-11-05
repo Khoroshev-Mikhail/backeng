@@ -22,7 +22,6 @@ class Vocabulary {
                 return res.status(200).send(trueVariant)
             }
             return res.status(204).send('the end')
-            
         } 
         catch(e) {
             return res.status(500).send(e.message)
@@ -69,14 +68,6 @@ class Vocabulary {
                 throw new Error('Неверный url')
             }
             await db.none('UPDATE user_vocabulary SET $1~ = $1~ || $2 WHERE id_user = $3', [req.params.method, req.body.word_id, req.params.id])
-            return res.sendStatus(200)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
-    static async wrong (req, res, next){
-        try {
             return res.sendStatus(200)
         } 
         catch(e) {

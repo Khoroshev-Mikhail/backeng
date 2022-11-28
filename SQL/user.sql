@@ -9,7 +9,9 @@ CREATE TABLE users (
     user_password VARCHAR(25),
     user_name VARCHAR(25),
     email VARCHAR(100) DEFAULT NULL, /*Добавить уникальность*/
-    birth DATE DEFAULT NULL
+    birth DATE DEFAULT NULL,
+    token VARCHAR(255) DEFAULT NULL, /*Добавить уникальность*/
+    refresh_token VARCHAR(255) DEFAULT NULL /*Добавить уникальность*/
 );
 
 INSERT INTO "users" 

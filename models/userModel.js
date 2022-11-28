@@ -1,3 +1,10 @@
+const db = require("../db");
+var jwt = require('jsonwebtoken');
+const SECRET = process.env.JWT_ACCESS_SECRET
+const SECRET_REFRESH = process.env.JWT_REFRESH_SECRET
+const TOKEN_LIFE_TIME = 1;
+const REFRESH_LIFE_HOURS = 100;
+
 class UserModel {
     static async getData (req, res, next){
         try {
@@ -10,11 +17,44 @@ class UserModel {
         }
     }
     static async auth (req, res, next){
-        try{
-            const data = await db.one('SELECT * FROM users WHERE user_login = $1 AND user_password = $2', [req.body.login, req.body.pwd]);
-            data.jwt = 'token dlya ara'
-            return res.status(200).send(data)
-        } catch(e){
+        try {
+            const { password, login } = req.body
+            const user = await db.one('SELECT id, user_login FROM users WHERE user_login = $1 AND user_password = $2', [login, password]);
+            const date = new Date();
+            const token = jwt.sign({ id: user.id, date }, SECRET);   
+            const refreshToken = jwt.sign({ id: user.id, date }, SECRET_REFRESH);   
+            await db.none('UPDATE users SET token = $1, refresh_token = $2 WHERE id = $3', [token, refreshToken, user.id])
+            return res.status(200).send({id: user.id, login: user.user_login, token, refreshToken, jwtExpire: date});
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
+    static async authByRefreshToken (req, res, next){
+        try {
+            if(req.body.refreshToken){
+                const headersRefresh = req.body.refreshToken
+                jwt.verify(headersRefresh, SECRET_REFRESH, async function(err, decoded) {
+                    if(err || !decoded){
+                        return res.sendStatus(500)
+                    }
+                    const user = await db.one('SELECT id, user_login, token, refresh_token FROM users WHERE id = $1', [decoded.id]);
+                    if(user.refresh_token === headersRefresh && new Date().getHours() - new Date(decoded.date).getHours() < REFRESH_LIFE_HOURS){
+                        const date = new Date()
+                        const token = jwt.sign({ id: user.id, date }, SECRET);   
+                        const refreshToken = jwt.sign({ id: user.id, date }, SECRET_REFRESH);    
+                        await db.none('UPDATE users SET token = $1, refresh_token = $2 WHERE id = $3', [token, refreshToken, user.id])
+                        return res.status(200).send({id: user.id, login: user.user_login, token, refreshToken, jwtExpire: date})
+                    }else{
+                        return res.sendStatus(426)
+                    }
+                    
+                });
+            } else{
+                return res.sendStatus(400)
+            }
+        } 
+        catch(e) {
             return res.status(500).send(e.message)
         }
     }
@@ -25,11 +65,15 @@ class UserModel {
             
         }
     }
-    async logout (req, res, next){
-        try{
-            
-        } catch(e){
-            
+    static async logout (req, res, next){
+        //Добавить проверку на соотетветствие id
+        try {
+            // console.log('/logout', req.user)
+            await db.none('UPDATE users SET token = $1, refresh_token = $1 WHERE id = $2', [null, req.params.id])
+            return res.status(200).send({id: 0, login: 'unknown', token: null, refreshToken: null});
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
         }
     }
 }

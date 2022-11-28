@@ -1,7 +1,10 @@
 const db = require("../db");
-
 class Vocabulary {
     static async getUserVocabulary (req, res, next){
+        console.log('getUserVocabulary', req.user.id)
+        if(!req.user || req.user && req.user.id !== req.params.id){
+            return res.sendStatus(401)
+        }
         try {
             const data = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [req.params.id]);
             console.log(data)
@@ -28,6 +31,10 @@ class Vocabulary {
         }
     }
     static async getVocabularyByMethod (req, res, next){
+        console.log('getVocabularyByMethod', req.user.id)
+        if(!req.user || req.user && req.user.id !== req.params.id){
+            return res.sendStatus(401)
+        }
         function falseVariants(vocabular, trueVariant){
             const count = vocabular.length - 1 <= 3 ? vocabular.length - 1 : 3 //Может быть в будущем предоставить на выбор клиенту количество вариантов для ответа
             let uniqueSet = new Set();
@@ -59,6 +66,9 @@ class Vocabulary {
     }
     static async update (req, res, next){
         try {
+            if(!req.user || req.user && req.user.id !== req.params.id){
+                return res.sendStatus(401)
+            }
             if(!req.body.word_id || !req.body.userId){
                 return res.sendStatus(400)
             }

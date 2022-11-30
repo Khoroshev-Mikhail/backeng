@@ -22,22 +22,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    static async getGroupProgress (req, res, next){
-        try {
-            const vocabulary = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [req.params.userId]);
-            const { word_ids: groupWords } = await db.one('SELECT word_ids FROM word_groups WHERE id = $1', [req.params.groupId]);
-            const result = {}
-            for(const key in vocabulary){
-                const unlerned = groupWords.filter(el => vocabulary[key].includes(el)).length
-                result[key] = Math.floor(unlerned / groupWords.length * 100)
-            }
-    
-            return res.status(200).send(result)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
+
     static async delete (req, res, next){
         try {
             await db.none('DELETE FROM word_groups WHERE id = $1', [req.body.id])

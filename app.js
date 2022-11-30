@@ -29,7 +29,7 @@ app.use(function(req, res, next) {
 });
 
 app.use(async function(req, res, next) {
-    // console.log('headers^^ ', req.headers.authorization)
+    
     if(req.headers.authorization && req.headers.authorization.split(' ').length == 3 && req.headers.authorization !== 'Bearer unknown unknown'){
         const headers = req.headers.authorization.split(' ')
         const headersToken = headers[1]
@@ -59,6 +59,15 @@ app.use(async function(req, res, next) {
     }
 });
 
+app.get('/get-cookie', (req, res) => {
+    console.log('Cookie: ', req.cookies)
+    res.send('Get Cookie')
+  })
+  
+app.get('/set-cookie', (req, res) => {
+    res.cookie('555', '555')
+    res.send('Set Cookie')
+})
 app.get('/', (req, res) => res.status(200).send(`Сервер ожидает запросов на порте ${PORT}`))
 
 app.get('/words', wordsModel.getAllWords)

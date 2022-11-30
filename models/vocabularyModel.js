@@ -37,7 +37,7 @@ class Vocabulary {
             const result = {}
             for(const key in vocabulary){
                 const lerned = groupWords.filter(el => vocabulary[key].includes(el)).length
-                result[key] = Math.round(lerned / (groupWords.length - 1) * 100)
+                result[key] = Math.round(lerned / (groupWords.length) * 100)
             }
             return res.status(200).send(result)
         } 

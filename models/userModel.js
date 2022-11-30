@@ -30,6 +30,7 @@ class UserModel {
             return res.status(500).send(e.message)
         }
     }
+
     static async authByRefreshToken (req, res, next){
         try {
             if(req.body.refreshToken){
@@ -39,7 +40,6 @@ class UserModel {
                         return res.sendStatus(500)
                     }
                     const user = await db.one('SELECT id, user_login, token, refresh_token FROM users WHERE id = $1', [decoded.id]);
-                    console.log('ara', user.refresh_token, headersRefresh)
                     if(user.refresh_token === headersRefresh && new Date().getHours() - new Date(decoded.date).getHours() < REFRESH_TOKEN_LIFE_TIME){
                         const date = new Date()
                         const token = jwt.sign({ id: user.id, date }, SECRET);   

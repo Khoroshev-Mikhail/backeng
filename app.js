@@ -1,21 +1,22 @@
 require('dotenv').config()
-const express = require("express");
-const app = express()
-const fileUpload = require('express-fileupload');
-const cookieParser = require("cookie-parser");
-var jwt = require('jsonwebtoken');
-const db = require("./db");
+
 const SECRET = process.env.JWT_ACCESS_SECRET
 const SECRET_REFRESH = process.env.JWT_REFRESH_SECRET
 const PORT = process.env.PORT || 3002
 const TOKEN_LIFE_TIME = process.env.TOKEN_LIFE_TIME_MINUTES;
 const REFRESH_TOKEN_LIFE_TIME = process.env.REFRESH_TOKEN_LIFE_TIME_HOURS;
 
-const groupsModel = require("./models/groupsModel.js");
-const wordsModel = require("./models/wordsModel.js");
-const textsModel = require('./models/textsModel.js');
-const vocabularyModel = require("./models/vocabularyModel.js");
-const userModel = require('./models/userModel.js');
+const express = require("express");
+const app = express()
+const fileUpload = require('express-fileupload');
+const cookieParser = require("cookie-parser");
+const jwt = require('jsonwebtoken');
+const db = require("./db");
+const routerGroup = require('./routes/routerGroup.js')
+const routerText = require('./routes/routerText.js')
+const routerWord = require('./routes/routerWord');
+const routerUser = require('./routes/routerUser');
+const routerVocabulary = require('./routes/routerVocabulary');
 
 app.use(fileUpload({ safeFileNames: /[^a-zа-яё\d\.]/ui, limits: { fileSize: 1 * 1024 * 1024 } }));
 app.use(express.static('public'));
@@ -58,56 +59,14 @@ app.use(async function(req, res, next) {
     }
 });
 
-// app.get('/get-cookie', (req, res) => {
-//     console.log('Cookie: ', req.cookies)
-//     res.send('Get Cookie')
-//   })
-  
-// app.get('/set-cookie', (req, res) => {
-//     res.cookie('555', '555')
-//     res.send('Set Cookie')
-// })
-
 app.get('/', (req, res) => res.status(200).send(`Сервер ожидает запросов на порте ${PORT}`))
 
-app.get('/words', wordsModel.getAllWords)
-app.get('/word/:id/groups', wordsModel.getAllGroupsIncludesWord)
-app.get('/words/group/:id', wordsModel.getAllWordsByGroup)
-app.post('/words', wordsModel.add)
-app.put('/words', wordsModel.update)
-app.delete('/words', wordsModel.delete)
+app.use('/groups', routerGroup)
+app.use('/texts', routerText)
+app.use('/words', routerWord)
+app.use('/user', routerUser)
+app.use('/vocabulary', routerVocabulary)
 
-app.get('/groups', groupsModel.getAllGroups)
-app.get('/groups/global', groupsModel.getAllGlobalGroups)
-app.get('/groups/global/onlyTitles', groupsModel.getAllGlobalGroupsTitles)
-app.post('/groups', groupsModel.add)
-app.put('/groups', groupsModel.update)
-app.delete('/groups', groupsModel.delete)
-app.put('/groups/addWordToGroup', groupsModel.addWordToGroup)
-app.put('/groups/deleteWordFromGroup', groupsModel.deleteWordFromGroup)
-app.get('/groups/:id/references', groupsModel.getReferences)
-app.get('/groups/:id', groupsModel.findOne)
-
-app.get('/vocabulary/:id', vocabularyModel.getUserVocabulary)
-app.get('/vocabulary/:id/unlerned/spelling/group/:groupId', vocabularyModel.getSpellVocabulary)
-app.get('/vocabulary/:id/unlerned/:method/group/:groupId', vocabularyModel.getVocabularyByMethod)
-app.put('/vocabulary/:id/:method', vocabularyModel.update)
-app.get('/vocabulary/groups/:groupId/progress/:userId', vocabularyModel.getGroupProgress)
-
-app.get('/user/:id', userModel.getData)
-app.post('/auth', userModel.auth)
-app.post('/authByRefreshToken', userModel.authByRefreshToken)
-app.post('/refreshToken', userModel.refreshToken)
-app.get('/logout/:id', userModel.logout)
-
-app.get('/texts', textsModel.getAll)
-app.get('/texts/global/titles', textsModel.getAllGlobalTextsTitles)
-app.post('/texts', textsModel.add)
-app.put('/texts', textsModel.update)
-app.delete('/texts', textsModel.delete)
-app.get('/texts/titles', textsModel.getAllTitles)
-app.get('/texts/:id/references', textsModel.getReferences)
-app.get('/texts/:id', textsModel.findOne)
 
 // Аудио добавить для референсес ендпоинт
 // Видео добавить для референсес ендпоинт

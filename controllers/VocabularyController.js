@@ -1,6 +1,6 @@
 const db = require("../db");
-class Vocabulary {
-    static async getUserVocabulary (req, res, next){
+class VocabularyController {
+    async getUserVocabulary (req, res, next){
         console.log('getUserVocabulary', req.user.id)
         if(!req.user || req.user && req.user.id != req.params.id){
             return res.sendStatus(401)
@@ -14,7 +14,7 @@ class Vocabulary {
             return res.status(500).send(e.message)
         }
     }
-    static async getSpellVocabulary (req, res, next){
+    async getSpellVocabulary (req, res, next){
         try {
             const vocabulary = await db.one('SELECT spelling FROM user_vocabulary WHERE id_user = $1', [req.params.id]);
             const group = await db.any('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [req.params.groupId]);
@@ -31,7 +31,7 @@ class Vocabulary {
         }
     }
     
-    static async getGroupProgress (req, res, next){
+    async getGroupProgress (req, res, next){
         try {
             // const isTrueUser = await db.oneOrNone('SELECT * FROM users WHERE id = $1', [req.params.userId]);
             // const isTrueGroup = await db.oneOrNone('SELECT * FROM word_groups WHERE id = $1', [req.params.groupId]);
@@ -61,7 +61,7 @@ class Vocabulary {
             return res.status(500).send(e.message)
         }
     }
-    static async getVocabularyByMethod (req, res, next){
+    async getVocabularyByMethod (req, res, next){
         if(!req.user || req.user && req.user.id != req.params.id){
             console.log(req.user)
             return res.sendStatus(401)
@@ -95,7 +95,7 @@ class Vocabulary {
             return res.status(500).send(e.message)
         }
     }
-    static async update (req, res, next){
+    async update (req, res, next){
         try {
             if(!req.user || req.user && req.user.id != req.params.id){
                 return res.sendStatus(401)
@@ -118,4 +118,4 @@ class Vocabulary {
     
 }
 
-module.exports = Vocabulary
+module.exports = new VocabularyController();

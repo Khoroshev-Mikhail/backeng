@@ -1,7 +1,7 @@
 const db = require("../db");
 
-class Words {
-    static async getAllWords (req, res, next){
+class WordController {
+    async getAllWords (req, res, next){
         try {
             const data = await db.any('SELECT * FROM words');
             return res.status(200).send(data)
@@ -10,7 +10,7 @@ class Words {
             return res.status(500).send(e.message)
         }
     }
-    static async add (req, res, next){
+    async add (req, res, next){
         try {
             const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [req.body.eng, req.body.rus])
             if(req.files.img !== undefined){
@@ -49,7 +49,7 @@ class Words {
             return res.status(500).send(e.message)
         }
     }
-    static async update (req, res, next){
+    async update (req, res, next){
         try {
             //Либо переписать это чтобы в postgress удалялось каскадом из массива idшник слова
             const { id } = await db.one('DELETE FROM words WHERE id = $1 RETURNING id', [req.body.id])
@@ -60,7 +60,7 @@ class Words {
             return res.status(500).send(e.message)
         }
     }
-    static async delete (req, res, next){
+    async delete (req, res, next){
         try {
             await db.none('DELETE FROM words WHERE id = $1', [req.body.id])
             return res.sendStatus(200)
@@ -69,7 +69,7 @@ class Words {
             return res.status(500).send(e.message)
         }
     }
-    static async getAllGroupsIncludesWord (req, res, next){
+    async getAllGroupsIncludesWord (req, res, next){
         try {
             const groups = await db.any('SELECT * FROM word_groups WHERE $1 = ANY(word_ids)', [req.params.id]);
             return res.status(200).send(groups)
@@ -78,7 +78,7 @@ class Words {
             return res.status(500).send(e.message)
         }
     }
-    static async getAllWordsByGroup (req, res, next){
+    async getAllWordsByGroup (req, res, next){
         try {
             const data = await db.any('SELECT words.id, words.eng, words.rus FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [req.params.id]);
             return res.status(200).send(data)
@@ -89,4 +89,4 @@ class Words {
     }
 }
 
-module.exports = Words
+module.exports = new WordController();

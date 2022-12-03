@@ -1,7 +1,7 @@
 const db = require("../db");
 
-class Groups {
-    static async getAllGroups (req, res, next){
+class GroupController {
+    async getAllGroups (req, res, next){
         try {
             const data = await db.any('SELECT * FROM word_groups');
             return res.status(200).send(data)
@@ -10,7 +10,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    static async findOne (req, res, next){
+    async findOne (req, res, next){
         try {
             const data = await db.any('SELECT * FROM word_groups WHERE id = $1', [req.params.id]);
             return res.status(200).send(data)
@@ -19,7 +19,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    static async add (req, res, next){
+    async add (req, res, next){
         try {
             if(!req.body.title || !req.body.title_rus){
                 throw new Error('Пустые поля в request.body')
@@ -32,7 +32,7 @@ class Groups {
         }
     }
 
-    static async delete (req, res, next){
+    async delete (req, res, next){
         try {
             await db.none('DELETE FROM word_groups WHERE id = $1', [req.body.id])
             return res.sendStatus(200)
@@ -41,7 +41,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    static async update (req, res, next){
+    async update (req, res, next){
         try {
             await db.none('UPDATE word_groups SET title = $2, title_rus = $3 WHERE id = $1', [req.body.id, req.body.title, req.body.title_rus])
             return res.sendStatus(200)
@@ -50,7 +50,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    static async addWordToGroup (req, res, next){
+    async addWordToGroup (req, res, next){
         try {
             await db.none('UPDATE word_groups SET word_ids = word_ids || $2 WHERE id = $1', [req.body.id, req.body.word_id])
             return res.sendStatus(200)
@@ -59,7 +59,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    static async deleteWordFromGroup (req, res, next){
+    async deleteWordFromGroup (req, res, next){
         try {
             await db.none('UPDATE word_groups SET word_ids = array_remove(word_ids, $2) WHERE id = $1', [req.body.id, req.body.word_id])
             return res.sendStatus(200)
@@ -68,7 +68,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    static async getAllGlobalGroups (req, res, next){
+    async getAllGlobalGroups (req, res, next){
         try {
             const data = await db.any('SELECT * FROM word_groups WHERE is_global = true');
             return res.status(200).send(data)
@@ -77,7 +77,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    static async getAllGlobalGroupsTitles (req, res, next){
+    async getAllGlobalGroupsTitles (req, res, next){
         try {
             const data = await db.any('SELECT id, title, title_rus FROM word_groups WHERE is_global = true');
             return res.status(200).send(data)
@@ -86,7 +86,7 @@ class Groups {
             return res.status(500).send(e.message)
         }
     }
-    static async getReferences (req, res, next){
+    async getReferences (req, res, next){
         try {
             const references = await db.oneOrNone('SELECT * FROM content_references WHERE id_group = $1', [req.params.id]);
             if(references === null){
@@ -104,4 +104,4 @@ class Groups {
     }
 }
 
-module.exports = Groups
+module.exports = new GroupController()

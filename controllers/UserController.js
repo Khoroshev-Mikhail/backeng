@@ -1,37 +1,33 @@
 const db = require("../db");
-var jwt = require('jsonwebtoken');
+const UserService = require('../services/UserService')
+const jwt = require('jsonwebtoken');
+
 const SECRET = process.env.JWT_ACCESS_SECRET
 const SECRET_REFRESH = process.env.JWT_REFRESH_SECRET
 const TOKEN_LIFE_TIME = process.env.TOKEN_LIFE_TIME_MINUTES;
 const REFRESH_TOKEN_LIFE_TIME = process.env.REFRESH_TOKEN_LIFE_TIME_HOURS;
 
 class UserController {
-    async getData (req, res, next){
+    async getOne (req, res){
         try {
-            //Здесь проверка JWT
-            const data = await db.one('SELECT * FROM users WHERE id = $1', [req.params.id]);
+            const data = await UserService.getOne(req.params.id);
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async auth (req, res, next){
+    async auth (req, res){
         try {
-            const { password, login } = req.body
-            const user = await db.one('SELECT id, user_login FROM users WHERE user_login = $1 AND user_password = $2', [login, password]);
-            const date = new Date();
-            const token = jwt.sign({ id: user.id, date }, SECRET);   
-            const refresh_token = jwt.sign({ id: user.id, date }, SECRET_REFRESH);   
-            await db.none('UPDATE users SET token = $1, refresh_token = $2 WHERE id = $3', [token, refresh_token, user.id])
-            return res.status(200).send({id: user.id, user_login: user.user_login, token, refresh_token, jwt_expire: date});
+            const data = await UserService.auth(req.body.login, req.body.password)
+            return res.status(200).send(data);
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
 
-    async authByRefreshToken (req, res, next){
+    async authByRefreshToken (req, res){
         try {
             if(req.body.refreshToken){
                 const headersRefresh = req.body.refreshToken
@@ -59,7 +55,7 @@ class UserController {
             return res.status(500).send(e.message)
         }
     }
-    async refreshToken (req, res, next){
+    async refreshToken (req, res){
         try {
             if(req.body.refreshToken){
                 const headersRefresh = req.body.refreshToken
@@ -94,12 +90,10 @@ class UserController {
             
         }
     }
-    async logout (req, res, next){
-        //Добавить проверку на соотетветствие id
+    async logout (req, res){
         try {
-            // console.log('/logout', req.user)
-            await db.none('UPDATE users SET token = $1, refresh_token = $1 WHERE id = $2', [null, req.params.id])
-            return res.status(200).send({id: 0, login: 'unknown', token: null, refreshToken: null});
+            const data = await UserService.logout(req.params.id)
+            return res.status(200).send(data);
         } 
         catch(e) {
             return res.status(500).send(e.message)

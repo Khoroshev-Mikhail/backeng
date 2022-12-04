@@ -6,6 +6,6 @@ routerUser.post('/auth', UserController.auth)
 routerUser.post('/authByRefreshToken', UserController.authByRefreshToken)
 routerUser.post('/refreshToken', UserController.refreshToken)
 routerUser.get('/logout/:id', UserController.logout)
-routerUser.get('/:id', UserController.getData)
+routerUser.get('/:id', UserController.getOne)
 
 module.exports = routerUser;

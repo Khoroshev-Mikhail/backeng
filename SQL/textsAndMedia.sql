@@ -10,7 +10,7 @@ CREATE TABLE texts (
     title VARCHAR(100),
     img VARCHAR(100) DEFAULT null,
     text_body TEXT, 
-    is_global DEFAULT true,
+    is_global BOOLEAN DEFAULT true,
     visible BOOLEAN DEFAULT true
 );
 
@@ -23,6 +23,7 @@ CREATE TABLE videos (
     title VARCHAR(100),
     img VARCHAR(100) DEFAULT null,
     video_description TEXT, 
+    is_global BOOLEAN DEFAULT true,
     visible BOOLEAN DEFAULT true
 );
 
@@ -34,6 +35,7 @@ CREATE TABLE audios (
     title VARCHAR(100),
     img VARCHAR(100) DEFAULT null,
     audio_description TEXT, 
+    is_global BOOLEAN DEFAULT true,
     visible BOOLEAN DEFAULT true
 );
 INSERT INTO "audios" ("title", "audio_description") VALUES ('First video', 'first video desc');

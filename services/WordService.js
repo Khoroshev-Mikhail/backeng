@@ -1,15 +1,8 @@
 const db = require("../db");
-const WordService = require("../services/WordService");
 
-class WordController {
-    async getAll (req, res, next){
-        try {
-            const data = await WordService.getAll()
-            return res.status(200).send(data)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
+class WordService {
+    async getAll (){
+        return await db.manyOrNone('SELECT * FROM words');
     }
     async add (req, res, next){
         try {
@@ -50,52 +43,51 @@ class WordController {
             return res.status(500).send(e.message)
         }
     }
-    async update (req, res, next){
-        try {
-            const data = await WordService.update()
-            return res.sendStatus(200)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
-    async updateText (req, res, next){
-        try {
-            const data = await WordService.updateText(req.params.id, req.body.eng, req.body.rus)
-            return res.status(200).send(data)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
-    async delete (req, res, next){
-        try {
-            const data = await WordService.delete(req.body.id)
-            console.log('data', data)
-            return res.sendStatus(200) //может 204?
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
-    async getAllGroupsIncludesWord (req, res, next){
-        try {
-            const data = WordService.getAllGroupsIncludesWord(req.params.id)
-            return res.status(200).send(data)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
-    async getAllWordsFromGroup (req, res, next){
-        try {
-            const data = WordService.getAllWordsFromGroup(req.params.id)
-            return res.status(200).send(data)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
-}
+    async update (id, rus, eng){
+        // Здесь добавь обновление с картинками
+        return 1
 
-module.exports = new WordController();
+    }
+    async updateText (id, eng, rus){
+        if(!id || !eng || !rus){
+            throw new Error('Не указан id или текстовые значения.')
+        }
+        await db.none('UPDATE words SET eng = $1, rus = $2 WHERE id = $3', [eng, rus, id])
+        const data = await db.one('SELECT * FROM words WHERE id = $1', [id])
+        return data
+
+    }
+    async delete (id){
+        if(!id){
+            throw new Error('Не указан id.')
+        }
+        await db.none('DELETE FROM words WHERE id = $1', [id])
+
+        //удалить из словаря всех пользователей
+        // Может добавить условие там где есть?
+        await db.none('UPDATE user_vocabulary SET english = array_remove(english, $1)', [id])
+        await db.none('UPDATE user_vocabulary SET russian = array_remove(russian, $1)', [id])
+        await db.none('UPDATE user_vocabulary SET spelling = array_remove(spelling, $1)', [id])
+        await db.none('UPDATE user_vocabulary SET auding = array_remove(auding, $1)', [id])
+
+        // Удалить из всех групп
+        // не тестил!!!
+        await db.none('UPDATE word_groups SET word_ids = array_remove(word_ids, $1)', [id])
+
+        return await db.none('SELECT id FROM words WHERE id = $1', [id])
+    }
+    async getAllGroupsIncludesWord (id){
+        if(!id){
+            throw new Error('Не указан id.')
+        }
+        return await db.manyOrNone('SELECT * FROM word_groups WHERE $1 = ANY(word_ids)', [id]);
+    }
+    async getAllWordsFromGroup (id){
+        if(!id){
+            throw new Error('Не указан id.')
+        }
+        return await db.manyOrNone('SELECT words.id, words.eng, words.rus FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [id]);
+    }
+};
+
+module.exports = new WordService();

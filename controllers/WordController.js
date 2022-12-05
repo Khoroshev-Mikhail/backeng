@@ -2,7 +2,7 @@ const db = require("../db");
 const WordService = require("../services/WordService");
 
 class WordController {
-    async getAll (req, res, next){
+    async getAll (req, res){
         try {
             const data = await WordService.getAll()
             return res.status(200).send(data)
@@ -11,7 +11,7 @@ class WordController {
             return res.status(500).send(e.message)
         }
     }
-    async add (req, res, next){
+    async add (req, res){
         try {
             const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [req.body.eng, req.body.rus])
             if(req.files.img !== undefined){
@@ -50,7 +50,7 @@ class WordController {
             return res.status(500).send(e.message)
         }
     }
-    async update (req, res, next){
+    async update (req, res){
         try {
             const data = await WordService.update()
             return res.sendStatus(200)
@@ -59,7 +59,7 @@ class WordController {
             return res.status(500).send(e.message)
         }
     }
-    async updateText (req, res, next){
+    async updateText (req, res){
         try {
             const data = await WordService.updateText(req.params.id, req.body.eng, req.body.rus)
             return res.status(200).send(data)
@@ -68,17 +68,16 @@ class WordController {
             return res.status(500).send(e.message)
         }
     }
-    async delete (req, res, next){
+    async delete (req, res){
         try {
-            const data = await WordService.delete(req.body.id)
-            console.log('data', data)
-            return res.sendStatus(200) //может 204?
+            await WordService.delete(req.body.id)
+            return res.sendStatus(204)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async getAllGroupsIncludesWord (req, res, next){
+    async getAllGroupsIncludesWord (req, res){
         try {
             const data = WordService.getAllGroupsIncludesWord(req.params.id)
             return res.status(200).send(data)
@@ -87,7 +86,7 @@ class WordController {
             return res.status(500).send(e.message)
         }
     }
-    async getAllWordsFromGroup (req, res, next){
+    async getAllWordsFromGroup (req, res){
         try {
             const data = WordService.getAllWordsFromGroup(req.params.id)
             return res.status(200).send(data)

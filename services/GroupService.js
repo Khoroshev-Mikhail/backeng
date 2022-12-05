@@ -7,7 +7,7 @@ class GroupService {
         if(!id) {
             throw new Error('Не указан id группы.')
         }
-        const data = await db.any('SELECT * FROM word_groups WHERE id = $1', [id]);
+        const data = await db.one('SELECT id, title, title_rus, word_ids FROM word_groups WHERE id = $1', [id]);
         const content_references = await db.oneOrNone('SELECT * FROM content_references WHERE id_group = $1', [id]);
         return { ...data, content_references }
     }
@@ -16,42 +16,38 @@ class GroupService {
             throw new Error('Не указаны заголовки.')
         }
         //перепиши чтобы группа которую заинсертили - она и возвращалась из бд
-        await db.none('INSERT INTO word_groups(title, title_rus, word_ids) VALUES($1, $2, array[]::integer[])', [title, title_rus])
-        return 1
+        const { id } = await db.one('INSERT INTO word_groups(title, title_rus, word_ids) VALUES($1, $2, array[]::integer[]) RETURNING id', [title, title_rus])
+        return await db.one('SELECT * FROM word_groups WHERE id = $1', [id]) //или можно использовать метод этого же класса?
     }
 
     async delete (id){
         if(!id) {
             throw new Error('Не указан id группы.')
         }
-        //перепиши чтобы группа которую заинсертили - она и возвращалась из бд
-        await db.none('DELETE FROM word_groups WHERE id = $1', [id])
-        return 1
+        return await db.none('DELETE FROM word_groups WHERE id = $1', [id])
     }
     async update (id, title, title_rus){
         if(!id || !title || !title_rus) {
             throw new Error('Не указан id группы либо заголовок.')
         }
-        //перепиши чтобы группа которую заинсертили - она и возвращалась из бд
         await db.none('UPDATE word_groups SET title = $2, title_rus = $3 WHERE id = $1', [id, title, title_rus])
-        return 1
+        const data = await db.one('SELECT * FROM word_group WHERE id = $1', [id])
+        return data
         
     }
     async addWordToGroup (id, id_word){
         if(!id || !id_word) {
             throw new Error('Не указан id группы или слова.')
         }
-        //перепиши чтобы группа которую заинсертили - она и возвращалась из бд
         await db.none('UPDATE word_groups SET word_ids = word_ids || $2 WHERE id = $1', [id, word_id])
-        return 1
+        return await db.one('SELECT word_ids FROM word_groups WHERE id = $1', [id])
     }
     async deleteWordFromGroup (id, id_word){
         if(!id || !id_word) {
             throw new Error('Не указан id группы или слова.')
         }
-        //перепиши чтобы группа которую заинсертили - она и возвращалась из бд
         await db.none('UPDATE word_groups SET word_ids = array_remove(word_ids, $2) WHERE id = $1', [id, word_id])
-        return 1
+        return await db.one('SELECT word_ids FROM word_groups WHERE id = $1', [id])
 
     }
     async getAllNoGlobal (){

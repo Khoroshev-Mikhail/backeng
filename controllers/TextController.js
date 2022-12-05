@@ -40,8 +40,8 @@ class TextController {
     }
     async update (req, res){
         try {
-            await TextService.update(req.body.title, req.body.img, req.body.text_body, req.body.id)
-            return res.sendStatus(200)
+            const data = await TextService.update(req.body.title, req.body.img, req.body.text_body, req.body.id)
+            return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
@@ -49,8 +49,8 @@ class TextController {
     }
     async updateWithoutImg (req, res){
         try {
-            await TextService.updateWithoutImg(req.body.title, req.body.text_body, req.body.id)
-            return res.sendStatus(200)
+            const data = await TextService.updateWithoutImg(req.body.title, req.body.text_body, req.body.id)
+            return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
@@ -59,7 +59,7 @@ class TextController {
     async delete (req, res){
         try {
             await TextService.delete(req.body.id)
-            return res.sendStatus(200)
+            return res.sendStatus(204)
         } 
         catch(e) {
             return res.status(500).send(e.message)
@@ -95,9 +95,6 @@ class TextController {
     async getReferences (req, res){
         try {
             const data = await TextService.getReferences(req.params.id);
-            if(data === null){
-                return res.status(200).send(null)
-            }
             return res.status(200).send(data)
         } 
         catch(e) {
@@ -107,9 +104,6 @@ class TextController {
     async getIdReferences (req, res){
         try {
             const data = await TextService.getIdReferences(req.params.id);
-            if(data === null){
-                return res.status(200).send(null)
-            }
             return res.status(200).send(data)
         } 
         catch(e) {

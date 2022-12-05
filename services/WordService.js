@@ -53,8 +53,7 @@ class WordService {
             throw new Error('Не указан id или текстовые значения.')
         }
         await db.none('UPDATE words SET eng = $1, rus = $2 WHERE id = $3', [eng, rus, id])
-        const data = await db.one('SELECT * FROM words WHERE id = $1', [id])
-        return data
+        return await db.one('SELECT * FROM words WHERE id = $1', [id])
 
     }
     async delete (id){
@@ -63,15 +62,12 @@ class WordService {
         }
         await db.none('DELETE FROM words WHERE id = $1', [id])
 
-        //удалить из словаря всех пользователей
         // Может добавить условие там где есть?
         await db.none('UPDATE user_vocabulary SET english = array_remove(english, $1)', [id])
         await db.none('UPDATE user_vocabulary SET russian = array_remove(russian, $1)', [id])
         await db.none('UPDATE user_vocabulary SET spelling = array_remove(spelling, $1)', [id])
         await db.none('UPDATE user_vocabulary SET auding = array_remove(auding, $1)', [id])
-
         // Удалить из всех групп
-        // не тестил!!!
         await db.none('UPDATE word_groups SET word_ids = array_remove(word_ids, $1)', [id])
 
         return await db.none('SELECT id FROM words WHERE id = $1', [id])

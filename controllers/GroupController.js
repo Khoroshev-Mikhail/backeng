@@ -21,7 +21,7 @@ class GroupController {
     }
     async getOne (req, res, next){
         try {
-            const data = GroupService.findOne(req.params.id)
+            const data = await GroupService.getOne(req.params.id)
             return res.status(200).send(data)
         } 
         catch(e) {
@@ -31,55 +31,52 @@ class GroupController {
     async add (req, res, next){
         try {
             //Send a new added group
-            await GroupService.add(req.body.title, req,body.title_rus)
-            return res.sendStatus(200)
+            const data = await GroupService.add(req.body.title, req.body.title_rus)
+            return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
 
-    async delete (req, res, next){
+    async delete (req, res){
         try {
-            //вернуть удаленную группу и добавить проверку на авторизацию
             await GroupService.delete(req.body.id)
-            return res.sendStatus(200)
+            return res.sendStatus(204)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    // почемуто при апдейте нарушилась сортировка групп при переименовании
-    async update (req, res, next){
+    // почемуто при апдейте нарушилась сортировка групп при переименовании upd может на клиенте
+    async update (req, res){
         try {
-            //вернуть удаленную группу и добавить проверку на авторизацию
-            await GroupService.update(req.body.id, req.body.title, req.body.title_rus)
-            return res.sendStatus(200)
+            const data = await GroupService.update(req.body.id, req.body.title, req.body.title_rus)
+            return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async addWordToGroup (req, res, next){
+    async addWordToGroup (req, res){
         try {
-            //вернуть удаленную группу и добавить проверку на авторизацию
-            await GroupService.addWordToGroup(req.body.id, req.body.word_id)
-            return res.sendStatus(200)
+            const data = await GroupService.addWordToGroup(req.body.id, req.body.word_id)
+            return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async deleteWordFromGroup (req, res, next){
+    async deleteWordFromGroup (req, res){
         try {
-            await GroupService.deleteWordFromGroup(req.body.id, req.body.word_id)
-            return res.sendStatus(200)
+            const data = await GroupService.deleteWordFromGroup(req.body.id, req.body.word_id)
+            return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async getAllNoGlobal (req, res, next){
+    async getAllNoGlobal (req, res){
         try {
             const data = await GroupService.getAllNoGlobal()
             return res.status(200).send(data)
@@ -88,7 +85,7 @@ class GroupController {
             return res.status(500).send(e.message)
         }
     }
-    async getAllNoGlobalTitles (req, res, next){
+    async getAllNoGlobalTitles (req, res){
         try {
             const data = await GroupService.getAllNoGlobalTitles()
             return res.status(200).send(data)
@@ -98,24 +95,18 @@ class GroupController {
         }
     }
 
-    async getReferences (req, res, next){
+    async getReferences (req, res){
         try {
             const data = await GroupService.getReferences(req.params.id);
-            if(data === null){
-                return res.status(200).send(null)
-            }
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async getIdReferences (req, res, next){
+    async getIdReferences (req, res){
         try {
             const data = await GroupService.getIdReferences(req.params.id);
-            if(data === null){
-                return res.status(200).send(null)
-            }
             return res.status(200).send(data)
         } 
         catch(e) {

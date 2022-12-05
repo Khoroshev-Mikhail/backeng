@@ -20,29 +20,29 @@ class TextService {
         if(!title | !img | !text_body) {
             throw new Error('Получены не все необходимые параметры текста.')
         }
-        await db.none('INSERT INTO texts(title, img, text_body) VALUES ($1, $2, $3)', [title, img, text_body])
-        return 1
+        const { id } = await db.one('INSERT INTO texts(title, img, text_body) VALUES ($1, $2, $3) RETURNING id', [title, img, text_body])
+        return await db.one('SELECT * FROM texts WHERE id = $1', [id])
     }
     async update (title, img, text_body, id){
         if(!title | !img | !text_body | !id) {
             throw new Error('Получены не все параметры текста.')
         }
         await db.none('UPDATE texts SET title = $1, img = $2, text_body = $3 WHERE id = $4', [title, img, text_body, id]);
-        return 1
+        return await db.one('SELECT * FROM texts WHERE id = $1', [id])
     }
     async updateWithoutImg (title, text_body, id){
         if(!title | !text_body | !id) {
             throw new Error('Получены не все параметры текста.')
         }
         await db.none('UPDATE texts SET title = $1, text_body = $2 WHERE id = $3', [title, text_body, id]);
-        return 1
+        return await db.one('SELECT * FROM texts WHERE id = $1', [id])
     }
     async delete (id){
         if(!id) {
             throw new Error('Не указан id текста.')
         }
         await db.none('DELETE FROM texts WHERE id = $1', [id]);
-        return 1
+        return await db.none('SELECT * FROM texts WHERE id = $1', [id]);
     }
     async getAllTitles (){
         const data = await db.manyOrNone('SELECT id, title, img FROM texts WHERE is_global = true');

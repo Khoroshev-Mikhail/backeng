@@ -14,7 +14,6 @@ routerGroup.put('/add-word', GroupController.addWordToGroup);
 routerGroup.put('/delete-word', GroupController.deleteWordFromGroup);
 
 routerGroup.get('/:id/references', GroupController.getReferences);
-routerGroup.get('/:id/id-references', GroupController.getIdReferences);
-routerGroup.get('/:id', GroupController.getOne);
+routerGroup.get('/:id', GroupController.getOne); //Здесь наверно тоже нужно условие чтобы не возвращать группы с пустым массивом, а на клиенте обрабатывать варианты когда ничего не приходит, особенно касается случаев с content_references
 
 module.exports = routerGroup;

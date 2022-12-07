@@ -1,5 +1,5 @@
-const db = require("../db");
 const TextService = require('../services/TextService')
+const Content_ReferencesService = require('../services/Content_ReferencesService')
 
 class TextController {
     async getAll (_, res){
@@ -83,27 +83,18 @@ class TextController {
             return res.status(500).send(e.message)
         }
     }
-    async getAllTitlesWithRefs (_, res){
-        try {
-            const data = await TextService.getAllTitlesWithRefs()
-            return res.status(200).send(data)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
     async getReferences (req, res){
         try {
-            const data = await TextService.getReferences(req.params.id);
+            const data = await Content_ReferencesService.getReferences(req.params.id, 'id_text');
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async getIdReferences (req, res){
+    async getRefGroupId (req, res){
         try {
-            const data = await TextService.getIdReferences(req.params.id);
+            const data = await Content_ReferencesService.getRefGroupId(req.params.id, 'id_text');
             return res.status(200).send(data)
         } 
         catch(e) {

@@ -14,9 +14,10 @@ const jwt = require('jsonwebtoken');
 const db = require("./db");
 const routerGroup = require('./routes/routerGroup.js')
 const routerText = require('./routes/routerText.js')
-const routerWord = require('./routes/routerWord');
-const routerUser = require('./routes/routerUser');
-const routerVocabulary = require('./routes/routerVocabulary');
+const routerWord = require('./routes/routerWord.js');
+const routerUser = require('./routes/routerUser.js');
+const routerAudio = require('./routes/routerAudio.js');
+const routerVocabulary = require('./routes/routerVocabulary.js');
 
 app.use(fileUpload({ safeFileNames: /[^a-zа-яё\d\.]/ui, limits: { fileSize: 1 * 1024 * 1024 } }));
 app.use(express.static('public'));
@@ -65,6 +66,7 @@ app.use('/groups', routerGroup)
 app.use('/texts', routerText)
 app.use('/words', routerWord)
 app.use('/user', routerUser)
+app.use('/audios', routerAudio)
 app.use('/vocabulary', routerVocabulary)
 
 

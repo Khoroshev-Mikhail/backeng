@@ -1,20 +1,19 @@
-const db = require("../db");
-const GroupService = require('../services/GroupService.js')
+const AudioService = require('../services/AudioService')
 const Content_ReferencesService = require('../services/Content_ReferencesService')
 
-class GroupController {
-    async getAll (req, res){
+class AudioController {
+    async getAll (_, res){
         try {
-            const data = await GroupService.getAll();
+            const data = await AudioService.getAll()
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async getAllTitles (req, res){
+    async getAllNoGlobal (_, res){
         try {
-            const data = await GroupService.getAllTitles()
+            const data = await AudioService.getAllNoGlobal()
             return res.status(200).send(data)
         } 
         catch(e) {
@@ -23,90 +22,85 @@ class GroupController {
     }
     async getOne (req, res){
         try {
-            const data = await GroupService.getOne(req.params.id)
+            const data = await AudioService.getOne(req.params.id)
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-
-    async add (req, res, next){
+    async add (req, res){
         try {
-            //Send a new added group
-            const data = await GroupService.add(req.body.title, req.body.title_rus)
+            await AudioService.add(req.body.title, req.body.img, req.body.text_body)
+            return res.sendStatus(200)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
+    async update (req, res){
+        try {
+            const data = await AudioService.update(req.body.title, req.body.img, req.body.text_body, req.body.id)
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-
+    async updateWithoutImg (req, res){
+        try {
+            const data = await AudioService.updateWithoutImg(req.body.title, req.body.text_body, req.body.id)
+            return res.status(200).send(data)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
     async delete (req, res){
         try {
-            await GroupService.delete(req.body.id)
+            await AudioService.delete(req.body.id)
             return res.sendStatus(204)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    // почемуто при апдейте нарушилась сортировка групп при переименовании upd может на клиенте
-    async update (req, res){
+    async getAllTitles (_, res){
         try {
-            const data = await GroupService.update(req.body.id, req.body.title, req.body.title_rus)
+            const data = await AudioService.getAllTitles()
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async addWordToGroup (req, res){
+    async getAllNoGlobalTitles (_, res){
         try {
-            const data = await GroupService.addWordToGroup(req.body.id, req.body.word_id)
+            const data = await AudioService.getAllNoGlobalTitles()
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async deleteWordFromGroup (req, res){
+    async getAllTitlesWithRefs (_, res){
         try {
-            const data = await GroupService.deleteWordFromGroup(req.body.id, req.body.word_id)
+            const data = await AudioService.getAllTitlesWithRefs()
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
     }
-    async getAllNoGlobal (req, res){
-        try {
-            const data = await GroupService.getAllNoGlobal()
-            return res.status(200).send(data)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
-    async getAllNoGlobalTitles (req, res){
-        try {
-            const data = await GroupService.getAllNoGlobalTitles()
-            return res.status(200).send(data)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
-
     async getReferences (req, res){
         try {
-            const data = await Content_ReferencesService.getReferences(req.params.id, 'id_group');
+            const data = await Content_ReferencesService.getReferences(req.params.id, 'id_audio');
             return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
         }
-    }
+    }    
 }
 
-module.exports = new GroupController()
+module.exports = new AudioController();

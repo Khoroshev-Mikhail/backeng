@@ -12,8 +12,7 @@ class TextService {
             throw new Error('Не указан id текста.')
         }
         const data = await db.one('SELECT * FROM texts WHERE id = $1', [id]);
-        const content_references = await db.oneOrNone('SELECT * FROM content_references WHERE id_text = $1', [id]);
-        return {...data, content_references}
+        return data
 
     }
     async add (title, img, text_body){
@@ -45,46 +44,16 @@ class TextService {
         return await db.none('SELECT * FROM texts WHERE id = $1', [id]);
     }
     async getAllTitles (){
-        const data = await db.manyOrNone('SELECT id, title, img FROM texts WHERE is_global = true');
+        const data = await db.manyOrNone('SELECT id, title, img FROM texts WHERE is_global = true AND visible = true');
         return data
     }
     async getAllNoGlobalTitles (){
         const data = await db.manyOrNone('SELECT id, title, img FROM texts WHERE is_global <> true');
         return data
     }
-    async getAllTitlesWithRefs (){
-        const data = await db.manyOrNone('SELECT id, title, img, id_group FROM texts LEFT JOIN content_references ON id = id_text AND is_global = true');
+    async getRefGroupId (id){
+        const data = await db.oneOrNone('SELECT id_group FROM content_references WHERE id_text = $1', [id])
         return data
-    }
-    async getReferences (id){
-        if(!id) {
-            throw new Error('Не указан id текста.')
-        }
-        const references = await db.oneOrNone('SELECT * FROM content_references WHERE id_text = $1', [id]);
-        if(references === null){
-            return null
-        }
-        const { id_group, id_text, id_audio, id_video } = references
-        const group = id_text ? await db.oneOrNone('SELECT * FROM word_groups WHERE id = $1', [id_group]) : null;
-        const text = id_text ? await db.oneOrNone('SELECT * FROM texts WHERE id = $1', [id_text]) : null;
-        const audio = id_audio ? await db.oneOrNone('SELECT * FROM audios WHERE id = $1', [id_audio]) : null;
-        const video = id_video ? await db.oneOrNone('SELECT * FROM videos WHERE id = $1', [id_video]) : null;
-        return { group, text, audio, video }
-    }
-    async getIdReferences (id){
-        if(!id) {
-            throw new Error('Не указан id текста.')
-        }
-        const references = await db.oneOrNone('SELECT * FROM content_references WHERE id_text = $1', [id]);
-        if(references === null){
-            return null
-        }
-        const { id_group, id_text, id_audio, id_video } = references
-        const group = id_text ? await db.oneOrNone('SELECT id FROM word_groups WHERE id = $1', [id_group]) : null;
-        const text = id_text ? await db.oneOrNone('SELECT id FROM texts WHERE id = $1', [id_text]) : null;
-        const audio = id_audio ? await db.oneOrNone('SELECT id FROM audios WHERE id = $1', [id_audio]) : null;
-        const video = id_video ? await db.oneOrNone('SELECT id FROM videos WHERE id = $1', [id_video]) : null;
-        return { group, text, audio, video }
     }
 };
 

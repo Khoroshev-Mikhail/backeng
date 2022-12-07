@@ -1,5 +1,5 @@
 const db = require("../db");
-
+//переделать чтобы была возможность возвращать нескольоко строк
 class Content_ReferencesController {
     async getReferences (req, res, next){
         try {

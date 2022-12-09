@@ -64,12 +64,17 @@ class UserService {
             }
         });
     }
-    async registration (){
-        try{
-            
-        } catch(e){
-            
+    async registration (user_login, user_password, user_name, email, birth){
+        if(!user_login || !user_password ){
+            throw new Error('Недостаточно данных.')
         }
+        const isNew = await db.oneOrNone('SELECT * FROM users WHERE user_login = $1', [user_login])
+        if(isNew){
+            throw new Error('Пользователь с таким логином уже зарегистрирован.')
+        }
+        const { id } = await db.one('INSERT INTO users (user_login, user_password, user_name, email, birth) VALUES ($1, $2, $3, $4, $5) RETURNING id', [user_login, user_password, user_name, email, birth || null])
+        await db.none('INSERT INTO user_vocabulary (id_user) VALUES ($1)', [id])
+        return await db.one('SELECT id, user_login, user_name, email, birth FROM users WHERE id = $1', [id])
     }
     async logout (id){
         if(!id){

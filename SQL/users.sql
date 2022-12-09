@@ -10,22 +10,14 @@ CREATE TABLE users (
     user_name VARCHAR(25),
     email VARCHAR(100) DEFAULT NULL, /*Добавить уникальность*/
     birth DATE DEFAULT NULL,
-    token VARCHAR(255) DEFAULT NULL, /*Добавить уникальность*/
-    refresh_token VARCHAR(255) DEFAULT NULL /*Добавить уникальность*/
+    token VARCHAR(255) DEFAULT NULL,
+    refresh_token VARCHAR(255) DEFAULT NULL
+    -- spelling INTEGER[] DEFAULT array[]::INTEGER[],
+    -- auding INTEGER[] DEFAULT array[]::INTEGER[],
+    -- english INTEGER[] DEFAULT array[]::INTEGER[],
+    -- russian INTEGER[] DEFAULT array[]::INTEGER[]
 );
 
 INSERT INTO "users" 
 ("user_login", "user_password", "user_name", "email") VALUES 
 ('mike', 'Araara14', 'Mikhail', '79836993884@ya.ru');
-
-CREATE TABLE user_vocabulary (
-    id_user INTEGER REFERENCES users (id),
-    spelling INTEGER[],
-    auding INTEGER[],
-    english INTEGER[],
-    russian INTEGER[]
-);
-
-INSERT INTO "user_vocabulary" ("id_user", "spelling", "auding", "english", "russian") 
-VALUES (1, ARRAY[1,2,3], ARRAY[10,11,12], ARRAY[19,20,21], ARRAY[28,29,30]);
-

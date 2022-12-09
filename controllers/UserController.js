@@ -83,11 +83,12 @@ class UserController {
             return res.status(500).send(e.message)
         }
     }
-    async registration (req, res, next){
+    async registration (req, res){
         try{
-            
+            const data = await UserService.registration(req.body.login, req.body.password, req.body.name, req.body.email, req.body.birth)
+            return res.status(200).send(data)
         } catch(e){
-            
+            return res.status(500).send(e.message)
         }
     }
     async logout (req, res){

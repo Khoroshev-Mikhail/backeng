@@ -8,6 +8,7 @@ class VocabularyService {
             throw new Error('Не указан id.')
         }
         const data = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [id]);
+        
         return data
     }
     async getSpellVocabulary (id, groupId){
@@ -15,7 +16,7 @@ class VocabularyService {
             throw new Error('Не указан id пользователя или группы.')
         }
         const vocabulary = await db.one('SELECT spelling FROM user_vocabulary WHERE id_user = $1', [id]);
-        const group = await db.any('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [groupId]);
+        const group = await db.any('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN groups ON words.id = ANY(groups.words) WHERE groups.id = $1', [groupId]);
         const unlernedGroup = group.filter(el => !vocabulary.spelling.includes(el.id) && el.rus && el.eng)
         if(unlernedGroup.length === 0){
             return null
@@ -30,7 +31,7 @@ class VocabularyService {
             throw new Error('Не указан id пользователя или группы.')
         }
         const vocabulary = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [id]);
-        const { word_ids: groupWords } = await db.one('SELECT word_ids FROM word_groups WHERE id = $1', [groupId]);
+        const { words: groupWords } = await db.one('SELECT words FROM groups WHERE id = $1', [groupId]);
         const result = {}
         const idsLerned = {}
         for(const key in vocabulary){
@@ -70,7 +71,7 @@ class VocabularyService {
         }
 
         const vocabulary = await db.one('SELECT $1~ FROM user_vocabulary WHERE id_user = $2', [method, id]);
-        const group = await db.manyOrNone('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [groupId]);
+        const group = await db.manyOrNone('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN groups ON words.id = ANY(groups.words) WHERE groups.id = $1', [groupId]);
         const unlernedGroup = group.filter(el => !vocabulary[method].includes(el.id) && el.rus && el.eng)
         if(unlernedGroup.length === 0){
             return null

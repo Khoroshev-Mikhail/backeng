@@ -65,7 +65,7 @@ class AudioService {
             return null
         }
         const { id_group, id_text, id_audio, id_video } = references
-        const group = id_group ? await db.oneOrNone('SELECT id, title, title_rus, img FROM word_groups WHERE id = $1', [id_group]) : null;
+        const group = id_group ? await db.oneOrNone('SELECT id, title, title_rus, img FROM words WHERE id = $1', [id_group]) : null;
         const text = id_text ? await db.oneOrNone('SELECT id, title img FROM texts WHERE id = $1', [id_text]) : null;
         const audio = id_audio ? await db.oneOrNone('SELECT id, title img FROM audios WHERE id = $1', [id_audio]) : null;
         const video = id_video ? await db.oneOrNone('SELECT id, title img FROM videos WHERE id = $1', [id_video]) : null;

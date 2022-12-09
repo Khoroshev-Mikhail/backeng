@@ -68,7 +68,7 @@ class WordService {
         await db.none('UPDATE user_vocabulary SET spelling = array_remove(spelling, $1)', [id])
         await db.none('UPDATE user_vocabulary SET auding = array_remove(auding, $1)', [id])
         // Удалить из всех групп
-        await db.none('UPDATE word_groups SET word_ids = array_remove(word_ids, $1)', [id])
+        await db.none('UPDATE groups SET words = array_remove(words, $1)', [id])
 
         return await db.none('SELECT id FROM words WHERE id = $1', [id])
     }
@@ -76,13 +76,13 @@ class WordService {
         if(!id){
             throw new Error('Не указан id.')
         }
-        return await db.manyOrNone('SELECT * FROM word_groups WHERE $1 = ANY(word_ids)', [id]);
+        return await db.manyOrNone('SELECT * FROM groups WHERE $1 = ANY(words)', [id]);
     }
     async getAllWordsFromGroup (id){
         if(!id){
             throw new Error('Не указан id.')
         }
-        return await db.manyOrNone('SELECT words.id, words.eng, words.rus FROM words LEFT JOIN word_groups ON words.id = ANY(word_groups.word_ids) WHERE word_groups.id = $1', [id]);
+        return await db.manyOrNone('SELECT words.id, words.eng, words.rus FROM words LEFT JOIN groups ON words.id = ANY(groups.words) WHERE groups.id = $1', [id]);
     }
 };
 

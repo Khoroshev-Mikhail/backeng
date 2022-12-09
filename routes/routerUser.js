@@ -5,6 +5,7 @@ const routerUser = new Router();
 routerUser.post('/auth', UserController.auth)
 routerUser.post('/authByRefreshToken', UserController.authByRefreshToken)
 routerUser.post('/refreshToken', UserController.refreshToken)
+routerUser.post('/registration', UserController.registration)
 routerUser.get('/logout/:id', UserController.logout)
 routerUser.get('/:id', UserController.getOne)
 

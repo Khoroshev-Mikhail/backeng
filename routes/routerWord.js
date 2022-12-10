@@ -7,6 +7,5 @@ routerWord.post('/', WordController.add)
 routerWord.put('/', WordController.update)
 routerWord.delete('/', WordController.delete)
 routerWord.get('/:id/groups', WordController.getAllGroupsIncludesWord)
-routerWord.get('/group/:id', WordController.getAllWordsFromGroup)
 
 module.exports = routerWord;

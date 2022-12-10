@@ -78,12 +78,6 @@ class WordService {
         }
         return await db.manyOrNone('SELECT * FROM groups WHERE $1 = ANY(words)', [id]);
     }
-    async getAllWordsFromGroup (id){
-        if(!id){
-            throw new Error('Не указан id.')
-        }
-        return await db.manyOrNone('SELECT words.id, words.eng, words.rus FROM words LEFT JOIN groups ON words.id = ANY(groups.words) WHERE groups.id = $1', [id]);
-    }
 };
 
 module.exports = new WordService();

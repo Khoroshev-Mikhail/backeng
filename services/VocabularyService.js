@@ -1,14 +1,14 @@
 const db = require("../db");
-const methods = ['russian', 'english', 'spelling', 'auding'] // Можно положить внутрь класса
+
 class VocabularyService {
     //при записи слова в вокабуляр надо возвращать новый вокабуляр
     //может быть отдельной строкой для каждого метода и отдельно их и хранить в бд и сторе. Но наверно это имеет смысл делать для оптимизации когда проект уже будет большой и важна будет скорость, пока что можно и так
+    methods = ['russian', 'english', 'spelling', 'auding', 'texts', 'audios', 'videos']; //Получи названия столбцов из бд
     async getOne (id){
         if(!id){
             throw new Error('Не указан id.')
         }
-        const data = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [id]);
-        
+        const data = await db.one('SELECT russian, english, spelling, auding, texts, audios, videos FROM user_vocabulary WHERE id_user = $1', [id]);
         return data
     }
     async getSpellVocabulary (id, groupId){
@@ -53,7 +53,7 @@ class VocabularyService {
         if(!id || !method){
             throw new Error('Не указан id.')
         }
-        if(!['russian', 'english', 'spelling', 'auding'].includes(method)){  //spelling? либо убери отсюда либо удали предыдущий метод в классе отдельный для spelling
+        if(! this.methods.includes(method)){  //spelling? либо убери отсюда либо удали предыдущий метод в классе отдельный для spelling
             throw new Error('Не верно указан метод изучения')
         }
 
@@ -85,23 +85,21 @@ class VocabularyService {
         if(!id || !word_id || !method){
             throw new Error('Не указан id пользователя или слова.')
         }
-        if(!['russian', 'english', 'spelling', 'auding'].includes(method)){ 
+        if(! this.methods.includes(method)){ 
             throw new Error('Не верно указан метод изучения')
         }
         await db.none('UPDATE user_vocabulary SET $1~ = $1~ || $2 WHERE id_user = $3', [method, word_id, id])
-        const data = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [id]);
-        return data
+        return await this.getOne(id)
     }
     async delete (id, word_id, method){
         if(!id || !word_id || !method){
-            throw new Error('Не указан id пользователя или слова.')
+            throw new Error('Не указан id пользователя, метода или слова.')
         }
-        if(!['russian', 'english', 'spelling', 'auding'].includes(method)){ 
-            throw new Error('Не верно указан метод изучения')
+        if(! this.methods.includes(method)){ 
+            throw new Error('Не верно указан метод изучения.')
         }
         await db.none('UPDATE user_vocabulary SET $1~ = array_remove($1~, $2) WHERE id_user = $3', [method, word_id, id])
-        const data = await db.one('SELECT english, russian, auding, spelling FROM user_vocabulary WHERE id_user = $1', [id]);
-        return data
+        return await this.getOne(id)
     }
 };
 

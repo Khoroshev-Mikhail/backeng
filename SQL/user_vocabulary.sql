@@ -10,7 +10,10 @@ CREATE TABLE user_vocabulary (
     spelling INTEGER[] DEFAULT array[]::INTEGER[],
     auding INTEGER[] DEFAULT array[]::INTEGER[],
     english INTEGER[] DEFAULT array[]::INTEGER[],
-    russian INTEGER[] DEFAULT array[]::INTEGER[]
+    russian INTEGER[] DEFAULT array[]::INTEGER[],
+    texts INTEGER[] DEFAULT array[]::INTEGER[],
+    audios INTEGER[] DEFAULT array[]::INTEGER[],
+    videos INTEGER[] DEFAULT array[]::INTEGER[]
 );
 
 INSERT INTO "user_vocabulary" ("id_user", "spelling", "auding", "english", "russian") 

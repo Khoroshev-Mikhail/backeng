@@ -4,6 +4,7 @@ const routerGroup = new Router();
 
 routerGroup.get('/', GroupController.getAll);
 routerGroup.get('/titles', GroupController.getAllTitles);
+routerGroup.get('/:id/words', GroupController.getAllWordsFromGroup);
 routerGroup.post('/', GroupController.add);
 routerGroup.put('/', GroupController.update);
 routerGroup.delete('/', GroupController.delete);

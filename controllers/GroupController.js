@@ -107,6 +107,15 @@ class GroupController {
             return res.status(500).send(e.message)
         }
     }
+    async getAllWordsFromGroup(req, res){
+        try {
+            const data = await GroupService.getAllWordsFromGroup(req.params.id);
+            return res.status(200).send(data)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
 }
 
 module.exports = new GroupController()

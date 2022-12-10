@@ -12,10 +12,6 @@ CREATE TABLE users (
     birth DATE DEFAULT NULL,
     token VARCHAR(255) DEFAULT NULL,
     refresh_token VARCHAR(255) DEFAULT NULL
-    -- spelling INTEGER[] DEFAULT array[]::INTEGER[],
-    -- auding INTEGER[] DEFAULT array[]::INTEGER[],
-    -- english INTEGER[] DEFAULT array[]::INTEGER[],
-    -- russian INTEGER[] DEFAULT array[]::INTEGER[]
 );
 
 INSERT INTO "users" 

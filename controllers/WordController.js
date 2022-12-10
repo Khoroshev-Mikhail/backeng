@@ -86,15 +86,6 @@ class WordController {
             return res.status(500).send(e.message)
         }
     }
-    async getAllWordsFromGroup (req, res){
-        try {
-            const data = WordService.getAllWordsFromGroup(req.params.id)
-            return res.status(200).send(data)
-        } 
-        catch(e) {
-            return res.status(500).send(e.message)
-        }
-    }
 }
 
 module.exports = new WordController();

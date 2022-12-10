@@ -7,11 +7,15 @@ class GroupService {
         if(!id) {
             throw new Error('Не указан id группы.')
         }
-        const data = await db.one('SELECT id, title, title_rus, words FROM groups WHERE id = $1', [id]);
-        const content_references = await db.oneOrNone('SELECT * FROM content_references WHERE id_group = $1', [id]);
-        return { ...data, content_references }
+        return await db.one('SELECT id, title, title_rus, words FROM groups WHERE id = $1', [id]);
     }
 
+    async getAllWordsFromGroup (id){
+        if(!id){
+            throw new Error('Не указан id.')
+        }
+        return await db.manyOrNone('SELECT words.id, words.eng, words.rus, words.audio, words.img FROM words LEFT JOIN groups ON words.id = ANY(groups.words) WHERE groups.id = $1', [id]);
+    }
     async add (title, title_rus){
         if(!title || !title_rus) {
             throw new Error('Не указаны заголовки.')

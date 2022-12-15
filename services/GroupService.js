@@ -7,7 +7,7 @@ class GroupService {
         if(!id) {
             throw new Error('Не указан id группы.')
         }
-        return await db.one('SELECT id, title, title_rus, words FROM groups WHERE id = $1', [id]);
+        return await db.one('SELECT * FROM groups WHERE id = $1', [id]);
     }
 
     async getAllWordsFromGroup (id){
@@ -15,6 +15,12 @@ class GroupService {
             throw new Error('Не указан id.')
         }
         return await db.manyOrNone('SELECT words.id, words.eng, words.rus, words.audio, words.img FROM words LEFT JOIN groups ON words.id = ANY(groups.words) WHERE groups.id = $1', [id]);
+    }
+    async getAllWord_idsFromGroup (id){
+        if(!id){
+            throw new Error('Не указан id.')
+        }
+        return await db.manyOrNone('SELECT words FROM groups WHERE id = $1', [id]);
     }
     async add (title, title_rus){
         if(!title || !title_rus) {
@@ -36,24 +42,34 @@ class GroupService {
             throw new Error('Не указан id группы либо заголовок.')
         }
         await db.none('UPDATE groups SET title = $2, title_rus = $3 WHERE id = $1', [id, title, title_rus])
-        const data = await db.one('SELECT * FROM word_group WHERE id = $1', [id])
-        return data
-        
+        return await db.one('SELECT * FROM groups WHERE id = $1', [id])
     }
-    async addWordToGroup (id, id_word){
-        if(!id || !id_word) {
+
+    async addWordIdToGroup (id, word_id){
+        if(!id || !word_id) {
             throw new Error('Не указан id группы или слова.')
         }
+        this.checkIncludesIntoGroup(id)
         await db.none('UPDATE groups SET words = words || $2 WHERE id = $1', [id, word_id])
-        return await db.one('SELECT words FROM groups WHERE id = $1', [id])
+        return await db.one('SELECT words FROM groups WHERE id = $1', [id]) 
     }
-    async deleteWordFromGroup (id, id_word){
-        if(!id || !id_word) {
+
+    async deleteWordFromGroup (id, word_id){
+        if(!id || !word_id) {
+            console.log(id, word_id)
             throw new Error('Не указан id группы или слова.')
         }
+        this.checkIncludesIntoGroup(id)
+        await db.none('UPDATE groups SET words = array_remove(words, $2) WHERE id = $1', [id, word_id])
+        return this.getAllWordsFromGroup(id)
+    }
+    async deleteWordIdFromGroup (id, word_id){
+        if(!id || !word_id) {
+            throw new Error('Не указан id группы или слова.')
+        }
+        this.checkIncludesIntoGroup(id)
         await db.none('UPDATE groups SET words = array_remove(words, $2) WHERE id = $1', [id, word_id])
         return await db.one('SELECT words FROM groups WHERE id = $1', [id])
-
     }
     async getAllNoGlobal (){
         return await db.any('SELECT * FROM groups WHERE is_global <> true');
@@ -64,7 +80,15 @@ class GroupService {
     async getAllTitles (){
         return await db.any(`SELECT id, title, title_rus FROM groups WHERE is_global = true AND words <> '{}'`);
     }
-
+    async checkIncludesIntoGroup (group_id){
+        const check =  await db.one('SELECT words FROM groups WHERE id = $1', [group_id])
+        check.words.forEach( async (word_id) => {
+            const result = await db.oneOrNone('SELECT id FROM words WHERE id = $1', [word_id]);
+            if(result === null){
+                await this.deleteWordIdFromGroup(group_id, word_id)
+            }
+        })
+    }
 };
 
 module.exports = new GroupService();

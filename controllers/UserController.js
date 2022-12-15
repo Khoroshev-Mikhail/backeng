@@ -41,7 +41,7 @@ class UserController {
                         const token = jwt.sign({ id: user.id, date }, SECRET);   
                         const refresh_token = jwt.sign({ id: user.id, date }, SECRET_REFRESH);    
                         await db.none('UPDATE users SET token = $1, refresh_token = $2 WHERE id = $3', [token, refresh_token, user.id])
-                        return res.status(200).send({id: user.id, user_login: user.user_login, token, refresh_token, jwt_expire: date})
+                        return res.status(200).send({id: user.id, user_login: user.user_login, token, refresh_token })
                     }else{
                         return res.sendStatus(426)
                     }
@@ -69,7 +69,7 @@ class UserController {
                         const token = jwt.sign({ id: user.id, date }, SECRET);  
                         const refresh_token = jwt.sign({ id: user.id, date }, SECRET_REFRESH);   
                         await db.none('UPDATE users SET token = $1, refresh_token = $2 WHERE id = $3', [token, refresh_token, user.id])
-                        return res.status(200).send({token, refresh_token, jwt_expire: date})
+                        return res.status(200).send({ token, refresh_token })
                     }else{
                         return res.sendStatus(426)
                     }

@@ -11,6 +11,24 @@ class WordController {
             return res.status(500).send(e.message)
         }
     }
+    async searchWords (req, res){
+        try {
+            const data = await WordService.searchWords(req.body.str)
+            return res.status(200).send(data)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
+    async getOne (req, res){
+        try {
+            const data = await WordService.getOne(req.params.id)
+            return res.status(200).send(data)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
     async add (req, res){
         try {
             const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [req.body.eng, req.body.rus])

@@ -31,11 +31,10 @@ app.use(function(req, res, next) {
     next();
 });
 app.use(async function(req, res, next) {
-    if(req.headers.authorization && req.headers.authorization.split(' ').length == 3 && req.headers.authorization !== 'Bearer unknown unknown'){
+    if(req.headers.authorization && req.headers.authorization.split(' ').length >= 2 && req.headers.authorization !== 'Bearer unknown'){
         const headers = req.headers.authorization.split(' ')
         const headersToken = headers[1]
-        const headersRefresh = headers[2]
-        if(!headersToken || !headersRefresh){
+        if(!headersToken ){
             req.user = null;
             next()
         }
@@ -59,7 +58,6 @@ app.use(async function(req, res, next) {
         next();
     }
 });
-
 app.get('/', (req, res) => res.status(200).send(`Сервер ожидает запросов на порте ${PORT}`))
 
 app.use('/groups', routerGroup)

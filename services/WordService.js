@@ -4,6 +4,17 @@ class WordService {
     async getAll (){
         return await db.manyOrNone('SELECT * FROM words');
     }
+    async searchWords (str){
+        if(! str){
+            throw new Error('Отсутствует строка для запроса.')
+        }
+        const str2 = str[0].toUpperCase() + str.substr(1) //костыль
+        const data = await db.manyOrNone(`SELECT * FROM words WHERE eng ~~* $1 OR rus ~~* $1 OR rus ~~* $2`, [`%${str}%`, `%${str2}%`]); //Русские символы почему то ищет с учетом регистра
+        return data
+    }
+    async getOne (id){
+        return await db.one('SELECT * FROM words WHERE id = $1', [id]);
+    }
     async add (req, res, next){
         try {
             const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [req.body.eng, req.body.rus])

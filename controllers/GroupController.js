@@ -63,7 +63,16 @@ class GroupController {
     }
     async addWordToGroup (req, res){
         try {
-            const data = await GroupService.addWordToGroup(req.body.id, req.body.word_id)
+            const data = await GroupService.addWordToGroup(req.params.id, req.body.word_id)
+            return res.status(200).send(data)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
+    async addWordIdToGroup (req, res){
+        try {
+            const data = await GroupService.addWordIdToGroup(req.params.id, req.body.word_id)
             return res.status(200).send(data)
         } 
         catch(e) {
@@ -72,7 +81,16 @@ class GroupController {
     }
     async deleteWordFromGroup (req, res){
         try {
-            const data = await GroupService.deleteWordFromGroup(req.body.id, req.body.word_id)
+            const data = await GroupService.deleteWordFromGroup(req.params.id, req.body.word_id)
+            return res.status(200).send(data)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
+    async deleteWordIdFromGroup (req, res){
+        try {
+            const data = await GroupService.deleteWordIdFromGroup(req.params.id, req.body.word_id)
             return res.status(200).send(data)
         } 
         catch(e) {
@@ -110,6 +128,15 @@ class GroupController {
     async getAllWordsFromGroup(req, res){
         try {
             const data = await GroupService.getAllWordsFromGroup(req.params.id);
+            return res.status(200).send(data)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
+    async getAllWord_idsFromGroup(req, res){
+        try {
+            const data = await GroupService.getAllWord_idsFromGroup(req.params.id);
             return res.status(200).send(data)
         } 
         catch(e) {

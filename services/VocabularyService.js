@@ -3,7 +3,7 @@ const db = require("../db");
 class VocabularyService {
     //при записи слова в вокабуляр надо возвращать новый вокабуляр
     //может быть отдельной строкой для каждого метода и отдельно их и хранить в бд и сторе. Но наверно это имеет смысл делать для оптимизации когда проект уже будет большой и важна будет скорость, пока что можно и так
-    methods = ['russian', 'english', 'spelling', 'auding', 'texts', 'audios', 'videos']; //Получи названия столбцов из бд
+    methods = ['russian', 'english', 'spelling', 'auding', 'texts', 'audios', 'videos']; //Получи названия столбцов из бд. ИЛИ внеси их ручками и сделай константой. но оставь метод класса чтобы их можно было получить на клиенте при инициализации приложения
     async getOne (id){
         if(!id){
             throw new Error('Не указан id.')
@@ -11,21 +11,7 @@ class VocabularyService {
         const data = await db.one('SELECT russian, english, spelling, auding, texts, audios, videos FROM user_vocabulary WHERE id_user = $1', [id]);
         return data
     }
-    async getSpellVocabulary (id, groupId){
-        if(!id || !groupId){
-            throw new Error('Не указан id пользователя или группы.')
-        }
-        const vocabulary = await db.one('SELECT spelling FROM user_vocabulary WHERE id_user = $1', [id]);
-        const group = await db.any('SELECT words.id, words.eng, words.rus, words.img, words.audio FROM words LEFT JOIN groups ON words.id = ANY(groups.words) WHERE groups.id = $1', [groupId]);
-        const unlernedGroup = group.filter(el => !vocabulary.spelling.includes(el.id) && el.rus && el.eng)
-        if(unlernedGroup.length === 0){
-            return null
-        }
-        const index = Math.floor(Math.random() * unlernedGroup.length)
-        const trueVariant = unlernedGroup[index]
-        return trueVariant
-    }
-    
+
     async getGroupProgress (id, groupId){
         if(!id || !groupId){
             throw new Error('Не указан id пользователя или группы.')

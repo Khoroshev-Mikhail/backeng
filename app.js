@@ -1,4 +1,5 @@
 require('dotenv').config()
+// const fs = require("fs");
 
 const SECRET = process.env.JWT_ACCESS_SECRET
 const SECRET_REFRESH = process.env.JWT_REFRESH_SECRET
@@ -59,6 +60,9 @@ app.use(async function(req, res, next) {
     }
 });
 app.get('/', (req, res) => res.status(200).send(`Сервер ожидает запросов на порте ${PORT}`))
+app.get('/test', async (req, res) => {
+    return res.status(200).send('asd')
+})
 
 app.use('/groups', routerGroup)
 app.use('/texts', routerText)

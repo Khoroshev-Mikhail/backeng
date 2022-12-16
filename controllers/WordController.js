@@ -31,38 +31,8 @@ class WordController {
     }
     async add (req, res){
         try {
-            const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [req.body.eng, req.body.rus])
-            if(req.files.img !== undefined){
-                const img = req.files.img;
-                const imgTypes = ['image/jpeg', 'image/png', 'image/jp2']
-                if(!imgTypes.includes(img.mimetype)){
-                    throw new Error('Не подходящий формат изображения')
-                }
-                const imgFileName = id + '_' + req.body.eng + img.name.match(/\.[\w\d]+$/i)[0]
-                const imgUploadPath = __dirname + '/../public/img/' + imgFileName;
-                await img.mv(imgUploadPath, function(err) {
-                    if (err) {
-                        throw new Error('Ошибка при загрузке изображения.')
-                    }
-                });
-                await db.none('UPDATE words SET img = $2 WHERE id = $1', [id, imgFileName])
-            }
-            if(req.files.audio !== undefined){
-                const audio = req.files.audio;
-                const audioTypes = ['audio/wave', 'audio/wav', 'audio/x-wav', 'audio/x-pn-wav', 'audio/webm', 'audio/ogg']
-                if(!audioTypes.includes(audio.mimetype)){
-                    throw new Error('Не подходящий формат аудио')
-                }
-                const audioFileName = id + '_' + req.body.eng + audio.name.match(/\.[\w\d]+$/i)[0]
-                const audioUploadPath = __dirname + '/../public/audio/' + audioFileName;
-                await audio.mv(audioUploadPath, function(err) {
-                    if (err) {
-                        throw new Error('Ошибка при загрузке аудио файла.')
-                    }
-                });
-                await db.none('UPDATE words SET audio = $2 WHERE id = $1', [id, audioFileName])
-            }
-            return res.status(200).send(`${id}`)
+            const data = await WordService.add(req.body.eng, req.body.rus, req.files.img, req.files.audio)
+            return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)
@@ -71,7 +41,7 @@ class WordController {
     async update (req, res){
         try {
             const data = await WordService.update()
-            return res.sendStatus(200)
+            return res.status(200).send(data)
         } 
         catch(e) {
             return res.status(500).send(e.message)

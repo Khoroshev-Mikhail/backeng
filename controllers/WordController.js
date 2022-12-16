@@ -40,7 +40,7 @@ class WordController {
     }
     async update (req, res){
         try {
-            const data = await WordService.update()
+            const data = await WordService.update(req.body.id, req.body.eng, req.body.rus, req.files?.img || undefined, req.files?.audio || undefined)
             return res.status(200).send(data)
         } 
         catch(e) {

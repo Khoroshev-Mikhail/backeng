@@ -1,8 +1,10 @@
-const db = require("../db");
-const fs = require("fs");
+import db from "../db";
+import { unlink, access, constants } from 'node:fs/promises';
+
 class WordService {
     audioTypes = ['audio/wave', 'audio/wav', 'audio/x-wav', 'audio/x-pn-wav', 'audio/webm', 'audio/ogg', 'audio/mpeg3', 'audio/x-mpeg-3', 'audio/mpeg']
     imgTypes = ['image/jpeg', 'image/png', 'image/jp2']
+    mediaPath = __dirname + '/../public'
     async getAll (){
         return await db.manyOrNone('SELECT * FROM words');
     }
@@ -39,13 +41,14 @@ class WordService {
             throw new Error('Не правильно указан id слова или у слова отсутствует значение eng.')
         }
         const imgFileName = id + '_' + eng + img.name.match(/\.[\w\d]+$/i)[0]
-        const imgUploadPath = __dirname + '/../public/img/' + imgFileName;
+        const imgUploadPath = this.mediaPath + '/img/' + imgFileName;
         await img.mv(imgUploadPath, function(err) {
             if (err) {
                 throw new Error('Ошибка при загрузке изображения.')
             }
         });
         await db.none('UPDATE words SET img = $2 WHERE id = $1', [id, imgFileName])
+        return await db.one('SELECT * FROM words WHERE id = $1', [id])
     }
     async addAudio (id, audio){
         if(! id){
@@ -62,30 +65,42 @@ class WordService {
             throw new Error('Не правильно указан id слова или у слова отсутствует значение eng.')
         }
         const audioFileName = id + '_' + eng + audio.name.match(/\.[\w\d]+$/i)[0]
-        const audioUploadPath = __dirname + '/../public/audio/' + audioFileName;
+        const audioUploadPath =  this.mediaPath + '/audio/' + audioFileName;
         await audio.mv(audioUploadPath, function(err) {
             if (err) {
                 throw new Error('Ошибка при загрузке аудио файла.')
             }
         });
         await db.none('UPDATE words SET audio = $2 WHERE id = $1', [id, audioFileName])
-    }
-    async update (id, rus, eng){
-        
-        return 1
-    }
-    async updateText (id, eng, rus){
-        if(!id || !eng || !rus){
-            throw new Error('Не указан id или текстовые значения.')
-        }
-        await db.none('UPDATE words SET eng = $1, rus = $2 WHERE id = $3', [eng, rus, id])
         return await db.one('SELECT * FROM words WHERE id = $1', [id])
-
     }
+    async update (id, eng, rus, img, audio){
+        if(! id ){
+            throw new Error('Не указан id слова.')
+        }
+        const word = await db.one("SELECT * FROM words WHERE id = $1", [id])
+        if(! word ){
+            throw new Error('Несуществующий id слова.')
+        }
+        if(img){
+            await unlink(this.mediaPath + '/img/' + word.img);
+            await this.addImg(id, img)
+        }
+        if(audio){
+            await unlink(this.mediaPath + '/audio/' + word.audio);
+            await this.addAudio(id, audio)
+        }
+        if(eng && rus){
+            await db.none('UPDATE words SET eng = $1, rus = $2 WHERE id = $3', [eng, rus, id])
+        }
+        return await db.one('SELECT * FROM words WHERE id = $1', [id])
+    }
+
     async delete (id){
         if(!id){
             throw new Error('Не указан id.')
         }
+        const { img, audio } = await db.one('SELECT * FROM words WHERE id = $1', [id])
         await db.none('DELETE FROM words WHERE id = $1', [id])
 
         // Может добавить условие там где есть?
@@ -95,7 +110,9 @@ class WordService {
         await db.none('UPDATE user_vocabulary SET auding = array_remove(auding, $1)', [id])
         // Удалить из всех групп
         await db.none('UPDATE groups SET words = array_remove(words, $1)', [id])
-
+        //Удалить медиафайлы
+        await unlink(this.mediaPath + '/img/' + img)
+        await unlink(this.mediaPath + '/audio/' + audio);
         return await db.none('SELECT id FROM words WHERE id = $1', [id])
     }
     async getAllGroupsIncludesWord (id){

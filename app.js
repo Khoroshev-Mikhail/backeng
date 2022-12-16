@@ -1,5 +1,7 @@
-require('dotenv').config()
+import * as dotenv from 'dotenv'
+dotenv.config()
 // const fs = require("fs");
+import { unlink, access, constants } from 'node:fs/promises';
 
 const SECRET = process.env.JWT_ACCESS_SECRET
 const SECRET_REFRESH = process.env.JWT_REFRESH_SECRET
@@ -7,12 +9,12 @@ const PORT = process.env.PORT || 3002
 const TOKEN_LIFE_TIME = process.env.TOKEN_LIFE_TIME_MINUTES;
 const REFRESH_TOKEN_LIFE_TIME = process.env.REFRESH_TOKEN_LIFE_TIME_HOURS;
 
-const express = require("express");
+import express from 'express'
 const app = express()
-const fileUpload = require('express-fileupload');
-const cookieParser = require("cookie-parser");
-const jwt = require('jsonwebtoken');
-const db = require("./db");
+import fileUpload from 'express-fileupload'
+import cookieParser from 'cookie-parser'
+import * as jwt from 'jsonwebtoken'
+import db from './db'
 const routerGroup = require('./routes/routerGroup.js')
 const routerText = require('./routes/routerText.js')
 const routerWord = require('./routes/routerWord.js');
@@ -61,6 +63,7 @@ app.use(async function(req, res, next) {
 });
 app.get('/', (req, res) => res.status(200).send(`Сервер ожидает запросов на порте ${PORT}`))
 app.get('/test', async (req, res) => {
+    console.log(await access(__dirname + '/public/img/51_ccc.jpeg', constants.F_OK))
     return res.status(200).send('asd')
 })
 

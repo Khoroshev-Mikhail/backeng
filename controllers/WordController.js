@@ -1,4 +1,3 @@
-const db = require("../db");
 const WordService = require("../services/WordService");
 
 class WordController {

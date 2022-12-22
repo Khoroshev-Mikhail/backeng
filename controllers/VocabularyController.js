@@ -49,6 +49,19 @@ class VocabularyController {
         }
     }
     
+    async getGroupProgress (req, res){
+        try {
+            if(!req.user || req.user && req.user.id != req.params.id){
+                return res.status(401).send('Не авторизирован.')
+            }
+            const data = await VocabularyService.getGroupProgress(req.params.id, req.params.id_group)
+            return res.status(200).send(data)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
+    
 }
 
 module.exports = new VocabularyController();

@@ -1,5 +1,5 @@
 import db from "../db";
-import { unlink, access, constants } from 'node:fs/promises';
+import { unlink } from 'node:fs/promises';
 
 class WordService {
     audioTypes = ['audio/wave', 'audio/wav', 'audio/x-wav', 'audio/x-pn-wav', 'audio/webm', 'audio/ogg', 'audio/mpeg3', 'audio/x-mpeg-3', 'audio/mpeg']
@@ -8,19 +8,19 @@ class WordService {
     async getAll (){
         return await db.manyOrNone('SELECT * FROM words');
     }
-    async searchWords (str){
-        if(! str){
-            throw new Error('Отсутствует строка для запроса.')
+    async searchWords (str = ''){
+        if(typeof str !== 'string'){
+            throw new Error('Не правильный формат строки')
         }
-        const str2 = str[0].toUpperCase() + str.substr(1) //костыль
-        const data = await db.manyOrNone(`SELECT * FROM words WHERE eng ~~* $1 OR rus ~~* $1 OR rus ~~* $2`, [`%${str}%`, `%${str2}%`]); //Русские символы почему то ищет с учетом регистра
+        // const data = await db.manyOrNone(`SELECT * FROM words WHERE eng ~~* $1 OR rus ~~* $1 OR rus ~~* $2`, [`%${str}%`, `%${str[0].toUpperCase() + str.substr(1)}%`]); //Русские символы почему то ищет с учетом регистра
+        const data = await db.manyOrNone(`SELECT * FROM words WHERE eng ~~* $1 OR rus ~~* $1`, [`%${str.toLowerCase()}%`]);
         return data
     }
     async getOne (id){
         return await db.one('SELECT * FROM words WHERE id = $1', [id]);
     }
     async add (eng, rus, img, audio){
-        const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [eng, rus])
+        const { id } = await db.one('INSERT INTO words(eng, rus) VALUES($1, $2) RETURNING id', [eng.toLowerCase(), rus.toLowerCase()])
         await this.addImg(id, img)
         await this.addAudio(id, audio)
         return await db.one('SELECT * FROM words WHERE id = $1', [id])
@@ -83,15 +83,25 @@ class WordService {
             throw new Error('Несуществующий id слова.')
         }
         if(img){
-            await unlink(this.mediaPath + '/img/' + word.img);
-            await this.addImg(id, img)
+            try{
+                await unlink(this.mediaPath + '/img/' + word.img);
+            }catch(e){
+                console.log(e.message)
+            }finally{
+                await this.addImg(id, img)
+            }
         }
         if(audio){
-            await unlink(this.mediaPath + '/audio/' + word.audio);
-            await this.addAudio(id, audio)
+            try{
+                await unlink(this.mediaPath + '/audio/' + word.audio);
+            }catch(e){
+                console.log(e.message)
+            }finally{
+                await this.addAudio(id, audio)
+            }
         }
         if(eng && rus){
-            await db.none('UPDATE words SET eng = $1, rus = $2 WHERE id = $3', [eng, rus, id])
+            await db.none('UPDATE words SET eng = $1, rus = $2 WHERE id = $3', [eng.toLowerCase(), rus.toLowerCase(), id])
         }
         return await db.one('SELECT * FROM words WHERE id = $1', [id])
     }

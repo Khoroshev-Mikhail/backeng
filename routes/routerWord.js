@@ -3,7 +3,7 @@ const WordController = require("../controllers/WordController.js");
 const routerWord = new Router();
 
 routerWord.get('/', WordController.getAll)
-routerWord.post('/search/', WordController.searchWords)
+routerWord.post('/search', WordController.searchWords)
 routerWord.post('/', WordController.add)
 routerWord.put('/', WordController.update)
 routerWord.delete('/', WordController.delete)

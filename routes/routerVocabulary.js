@@ -6,6 +6,7 @@ routerVocabulary.get('/:id/unlerned/:method/group/:groupId', VocabularyControlle
 routerVocabulary.get('/groups/:id_group/progress/:id', VocabularyController.getGroupProgress)
 routerVocabulary.put('/:id/:method', VocabularyController.update)
 routerVocabulary.delete('/:id/:method', VocabularyController.delete)
+routerVocabulary.get('/:id/words', VocabularyController.getWordsFromVocabulary)
 routerVocabulary.get('/:id', VocabularyController.getOne)
 
 module.exports = routerVocabulary;

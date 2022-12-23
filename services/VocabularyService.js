@@ -87,6 +87,14 @@ class VocabularyService {
         await db.none('UPDATE user_vocabulary SET $1~ = array_remove($1~, $2) WHERE id_user = $3', [method, word_id, id])
         return await this.getOne(id)
     }
+    async getWordsFromVocabulary (id_user, limit = 10, str){
+        if(!id_user){
+            throw new Error('Не указан id пользователя')
+        }
+        const vocabulary = await db.one('SELECT english, russian, spelling, auding FROM user_vocabulary WHERE id_user = $1', [id_user])
+        const flatVocabulary = [...vocabulary.english, ...vocabulary.russian, ...vocabulary.auding, ...vocabulary.spelling]
+        return await db.manyOrNone(`SELECT * FROM words WHERE id = ANY($1)${str ? ` AND eng ~~* $3 OR rus ~~* $3` : ''} LIMIT $2`, [flatVocabulary, limit, `%${str}%`])
+    }
 };
 
 module.exports = new VocabularyService();

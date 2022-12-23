@@ -125,11 +125,11 @@ class WordService {
         await unlink(this.mediaPath + '/audio/' + audio);
         return await db.none('SELECT id FROM words WHERE id = $1', [id])
     }
-    async getAllGroupsIncludesWord (id){
+    async getAllGroupsIncludesWord (id_word){
         if(!id){
-            throw new Error('Не указан id.')
+            throw new Error('Не указан id слова.')
         }
-        return await db.manyOrNone('SELECT * FROM groups WHERE $1 = ANY(words)', [id]);
+        return await db.manyOrNone('SELECT * FROM groups WHERE $1 = ANY(words)', [id_word]);
     }
 };
 

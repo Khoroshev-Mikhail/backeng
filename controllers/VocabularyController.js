@@ -62,6 +62,19 @@ class VocabularyController {
         }
     }
     
+    async getWordsFromVocabulary (req, res){
+        try {
+            if(!req.user || req.user && req.user.id != req.params.id){
+                return res.status(401).send('Не авторизирован.')
+            }
+            const data = await VocabularyService.getWordsFromVocabulary(req.params.id, req.query.limit, req.query.str)
+            return res.status(200).send(data)
+        } 
+        catch(e) {
+            return res.status(500).send(e.message)
+        }
+    }
+    
 }
 
 module.exports = new VocabularyController();
